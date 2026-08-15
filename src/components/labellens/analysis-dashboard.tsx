@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { ConsumerReport } from "@/components/labellens/consumer-report";
 import { ScoreRing } from "@/components/labellens/score-ring";
 import {
   ConfidenceBadge,
@@ -252,6 +253,35 @@ function AskPanel({ report }: { report: AnalysisReport }) {
   );
 }
 
+function TechnicalSection({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section aria-labelledby="technical-analysis">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-card/60 px-5 py-4 text-left transition-colors hover:bg-secondary/50"
+      >
+        <span>
+          <span id="technical-analysis" className="block font-display font-semibold">
+            Full technical analysis
+          </span>
+          <span className="mt-0.5 block text-sm text-muted-foreground">
+            Score breakdown, regulatory references, NOVA reasoning, nutrition and allergen detail.
+          </span>
+        </span>
+        <ChevronDown
+          className={cn("size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")}
+          aria-hidden="true"
+        />
+      </button>
+      {open ? <div className="mt-6 space-y-8">{children}</div> : null}
+    </section>
+  );
+}
+
+
 export function AnalysisDashboard({ report }: { report: AnalysisReport }) {
   const [showDetails, setShowDetails] = useState(false);
   const identified = report.ingredients.filter((i) => i.knowledge).length;
@@ -299,6 +329,9 @@ export function AnalysisDashboard({ report }: { report: AnalysisReport }) {
         </p>
       </section>
 
+      <ConsumerReport report={report} />
+
+      <TechnicalSection>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card
           title="Ingredients"
@@ -533,6 +566,7 @@ export function AnalysisDashboard({ report }: { report: AnalysisReport }) {
           ))}
         </ul>
       </section>
+      </TechnicalSection>
 
       <AskPanel report={report} />
 
