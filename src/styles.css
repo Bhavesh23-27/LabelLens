@@ -238,3 +238,130 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ------------------------------- expressive layer -------------------------------
+ * Depth, light and motion utilities used by the marketing + scan surfaces.
+ * All values derive from the semantic tokens above.
+ * ------------------------------------------------------------------------------ */
+
+@utility aurora {
+  position: relative;
+  background-color: var(--color-secondary);
+  background-image:
+    radial-gradient(80% 60% at 12% 0%, oklch(from var(--color-primary-glow) l c h / 26%) 0%, transparent 60%),
+    radial-gradient(70% 55% at 92% 6%, oklch(from var(--color-accent) l c h / 60%) 0%, transparent 62%),
+    radial-gradient(60% 70% at 50% 110%, oklch(from var(--color-primary) l c h / 18%) 0%, transparent 65%);
+}
+
+@utility mesh-soft {
+  background-image:
+    radial-gradient(60% 60% at 0% 0%, oklch(from var(--color-primary) l c h / 10%) 0%, transparent 60%),
+    radial-gradient(50% 50% at 100% 20%, oklch(from var(--color-attention) l c h / 12%) 0%, transparent 60%);
+}
+
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, oklch(from var(--color-primary) l c h / 7%) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(from var(--color-primary) l c h / 7%) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(75% 65% at 50% 30%, black 0%, transparent 100%);
+}
+
+@utility glass {
+  background-color: oklch(from var(--color-card) l c h / 72%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid oklch(from var(--color-primary) l c h / 14%);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lift);
+}
+
+@utility panel {
+  position: relative;
+  background-color: var(--color-card);
+  border: 1px solid oklch(from var(--color-primary) l c h / 12%);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 60%) inset, var(--shadow-soft);
+}
+
+@utility glow-primary {
+  box-shadow:
+    0 10px 30px -12px oklch(from var(--color-primary) l c h / 45%),
+    0 0 0 1px oklch(from var(--color-primary) l c h / 12%);
+}
+
+@utility hover-lift {
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+    border-color: oklch(from var(--color-primary) l c h / 32%);
+  }
+}
+
+@utility ring-dot {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: auto auto 0 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-primary-glow);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -160% 0;
+  }
+  100% {
+    background-position: 260% 0;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 oklch(from var(--color-primary) l c h / 35%);
+  }
+  70% {
+    box-shadow: 0 0 0 14px oklch(from var(--color-primary) l c h / 0%);
+  }
+  100% {
+    box-shadow: 0 0 0 0 oklch(from var(--color-primary) l c h / 0%);
+  }
+}
+
+@utility animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@utility animate-pulse-ring {
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+
+@utility shimmer-text {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-primary) 20%,
+    var(--color-primary-glow) 42%,
+    var(--color-primary) 62%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 5s linear infinite;
+}
