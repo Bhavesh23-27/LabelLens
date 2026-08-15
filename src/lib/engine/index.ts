@@ -24,7 +24,7 @@ export { calculateInsightScore, calculateConfidence, buildVerdict } from "./scor
  */
 export function runAnalysis(input: {
   text: string;
-  method: "image" | "manual" | "demo";
+  method: "image" | "manual" | "text" | "barcode" | "demo";
   index: KnowledgeIndex;
   ocrConfidence?: number | null;
   nutrition?: NutritionFacts | null;

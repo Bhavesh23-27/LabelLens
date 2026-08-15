@@ -26,7 +26,7 @@ const nutritionSchema = z
 
 const analyzeSchema = z.object({
   text: z.string().trim().min(3, "Please provide an ingredient list.").max(8000),
-  method: z.enum(["image", "manual", "demo"]).default("manual"),
+  method: z.enum(["image", "manual", "text", "barcode", "demo"]).default("manual"),
   productName: z.string().trim().max(160).nullable().optional(),
   brand: z.string().trim().max(160).nullable().optional(),
   ocrConfidence: z.number().min(0).max(1).nullable().optional(),
@@ -41,6 +41,17 @@ const ocrSchema = z.object({
     .refine(
       (value) => /^data:image\/(jpe?g|png|webp);base64,/.test(value),
       "Only JPG, PNG or WEBP images are supported.",
+    ),
+});
+
+const barcodeSchema = z.object({
+  barcode: z
+    .string()
+    .trim()
+    .transform((value) => value.replace(/[^0-9]/g, ""))
+    .refine(
+      (value) => value.length >= 8 && value.length <= 14,
+      "Enter the 8–14 digit barcode number printed under the bars.",
     ),
 });
 
@@ -85,6 +96,28 @@ export const runLabelOcr = createServerFn({ method: "POST" })
           : "Couldn't read the ingredient list clearly.";
       return { ok: false as const, code: "OCR_FAILED", message };
     }
+  });
+
+/* ------------------------------ barcode lookup ------------------------------ */
+
+export const lookupBarcode = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => barcodeSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { lookupBarcodeOnOpenFoodFacts } = await import("@/lib/barcode.server");
+    const result = await lookupBarcodeOnOpenFoodFacts(data.barcode);
+    if (!result.ok) {
+      return { ok: false as const, code: "BARCODE_NOT_FOUND", message: result.message };
+    }
+    if (!result.product.ingredientsText || result.product.ingredientsText.length < 12) {
+      return {
+        ok: false as const,
+        code: "NO_INGREDIENT_LIST",
+        message:
+          "That product exists in the open database, but it has no ingredient list recorded yet. Photograph the panel instead.",
+        product: result.product,
+      };
+    }
+    return { ok: true as const, product: result.product };
   });
 
 /* ----------------------------- analysis pipeline ---------------------------- */
