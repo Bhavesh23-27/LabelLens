@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { ConsumerReport } from "@/components/labellens/consumer-report";
 import { ScoreRing } from "@/components/labellens/score-ring";
 import {
   ConfidenceBadge,
