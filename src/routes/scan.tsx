@@ -75,6 +75,7 @@ function ScanPage() {
   const barcodeLookup = useServerFn(lookupBarcode);
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [productName, setProductName] = useState("");
