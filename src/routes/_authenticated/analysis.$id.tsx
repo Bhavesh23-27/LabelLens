@@ -46,9 +46,10 @@ function AnalysisPage() {
 
         {data && data.ok ? (
           <AnalysisDashboard
-            report={(data.analysis as { report: AnalysisReport }).report as AnalysisReport}
+            report={(data.analysis as unknown as { report: AnalysisReport }).report}
           />
         ) : null}
+
       </div>
     </PageShell>
   );

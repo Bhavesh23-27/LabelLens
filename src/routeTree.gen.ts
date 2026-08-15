@@ -10,12 +10,39 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SourcesRouteImport } from './routes/sources'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedAnalysisIdRouteImport } from './routes/_authenticated/analysis.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -23,39 +50,118 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
   path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScanRoute = ScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SourcesRoute = SourcesRouteImport.update({
   id: '/sources',
   path: '/sources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAnalysisIdRoute = AuthenticatedAnalysisIdRouteImport.update({
+  id: '/analysis/$id',
+  path: '/analysis/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
+  '/explore': typeof ExploreRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/scan': typeof ScanRoute
   '/sources': typeof SourcesRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/analysis/$id': typeof AuthenticatedAnalysisIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
+  '/explore': typeof ExploreRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/scan': typeof ScanRoute
   '/sources': typeof SourcesRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/analysis/$id': typeof AuthenticatedAnalysisIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
+  '/explore': typeof ExploreRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/scan': typeof ScanRoute
   '/sources': typeof SourcesRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/analysis/$id': typeof AuthenticatedAnalysisIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/how-it-works' | '/sources'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/compare'
+    | '/explore'
+    | '/how-it-works'
+    | '/scan'
+    | '/sources'
+    | '/account'
+    | '/history'
+    | '/analysis/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/how-it-works' | '/sources'
-  id: '__root__' | '/' | '/how-it-works' | '/sources'
+  to:
+    | '/'
+    | '/auth'
+    | '/compare'
+    | '/explore'
+    | '/how-it-works'
+    | '/scan'
+    | '/sources'
+    | '/account'
+    | '/history'
+    | '/analysis/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/compare'
+    | '/explore'
+    | '/how-it-works'
+    | '/scan'
+    | '/sources'
+    | '/_authenticated/account'
+    | '/_authenticated/history'
+    | '/_authenticated/analysis/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  CompareRoute: typeof CompareRoute
+  ExploreRoute: typeof ExploreRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  ScanRoute: typeof ScanRoute
   SourcesRoute: typeof SourcesRoute
 }
 
@@ -68,11 +174,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/how-it-works': {
       id: '/how-it-works'
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scan': {
+      id: '/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sources': {
@@ -82,12 +223,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analysis/$id': {
+      id: '/_authenticated/analysis/$id'
+      path: '/analysis/$id'
+      fullPath: '/analysis/$id'
+      preLoaderRoute: typeof AuthenticatedAnalysisIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedAnalysisIdRoute: typeof AuthenticatedAnalysisIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedAnalysisIdRoute: AuthenticatedAnalysisIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  CompareRoute: CompareRoute,
+  ExploreRoute: ExploreRoute,
   HowItWorksRoute: HowItWorksRoute,
+  ScanRoute: ScanRoute,
   SourcesRoute: SourcesRoute,
 }
 export const routeTree = rootRouteImport
