@@ -1,24 +1,156 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Database, Gauge, ScanLine, Scale, Sparkles } from "lucide-react";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import heroImage from "@/assets/hero-scan.jpg";
+import { Disclaimer, PageShell, SectionHeading } from "@/components/labellens/site-layout";
+import { StatusPill } from "@/components/labellens/status";
+import { Button } from "@/components/ui/button";
+
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "LabelLens — Understand What's Really in Your Food" },
+      {
+        name: "description",
+        content:
+          "Scan or paste a packaged-food ingredient list and get a traceable, ingredient-by-ingredient analysis: what each additive does, processing level and referenced food-safety information.",
+      },
+      { property: "og:title", content: "LabelLens — Understand What's Really in Your Food" },
+      {
+        property: "og:description",
+        content:
+          "Deterministic ingredient intelligence with plain-language explanations. Every finding shows its source and confidence.",
+      },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const PILLARS = [
+  {
+    icon: Database,
+    title: "Structured knowledge, not guesswork",
+    body: "Ingredients are matched to a curated database using INS numbers and aliases. Unmatched entries are flagged, not invented.",
+  },
+  {
+    icon: Scale,
+    title: "Regulatory checks by rules",
+    body: "Permitted-use information comes from stored FSSAI-referenced rules with version and verification dates — never from a language model.",
+  },
+  {
+    icon: Gauge,
+    title: "A score you can audit",
+    body: "The Insight Score shows every dimension and its points, so you can see exactly why a product scored what it did.",
+  },
+  {
+    icon: Sparkles,
+    title: "AI only for explaining",
+    body: "AI turns verified findings into readable language at the final step, and says when it doesn't know.",
+  },
+];
+
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <PageShell>
+      <section className="paper-grain border-b border-border/70 bg-secondary/40">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:px-6 md:py-20">
+          <div>
+            <StatusPill severity="verified">Traceable ingredient intelligence</StatusPill>
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] sm:text-5xl">
+              Understand what's really in your food.
+            </h1>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              LabelLens reads a packaged-food label, identifies every ingredient, checks referenced
+              food-safety information and explains it in plain language — showing its working at
+              each step.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link to="/scan">
+                  <ScanLine className="size-4" aria-hidden="true" />
+                  Analyse a label
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/how-it-works">See how it works</Link>
+              </Button>
+            </div>
+            <p className="mt-5 text-xs text-muted-foreground">
+              No account needed to run an analysis. Sign in only if you want to save it.
+            </p>
+          </div>
+          <img
+            src={heroImage}
+            alt="A phone showing a LabelLens ingredient analysis beside a packaged food carton"
+            width={1280}
+            height={1024}
+            className="w-full rounded-3xl border border-border object-cover shadow-[var(--shadow-soft,0_18px_40px_-24px_rgba(0,0,0,0.35))]"
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <SectionHeading
+          eyebrow="Why it's different"
+          icon={Database}
+          title="Clarity you can check, not a verdict you must trust"
+          description="Most label apps hand you a number. LabelLens shows the ingredient match, the rule it applied, the source it came from and how confident it is."
+        />
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2">
+          {PILLARS.map((pillar) => (
+            <li key={pillar.title} className="surface p-5">
+              <span className="flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                <pillar.icon className="size-5" aria-hidden="true" />
+              </span>
+              <h3 className="mt-4 font-display text-lg font-semibold">{pillar.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{pillar.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="border-y border-border/70 bg-secondary/30">
+        <div className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+          <SectionHeading
+            eyebrow="Three steps"
+            icon={ScanLine}
+            title="From photo to understanding in under a minute"
+          />
+          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+            {[
+              ["Capture the panel", "Photograph the ingredient list or paste the text."],
+              ["Ingredients identified", "Each entry is matched, checked against stored rules and scored."],
+              ["Understand and decide", "Read plain-language findings, then ask follow-up questions."],
+            ].map(([title, body], index) => (
+              <li key={title} className="surface p-5">
+                <span className="font-display text-3xl font-semibold text-primary/40">
+                  0{index + 1}
+                </span>
+                <h3 className="mt-3 font-display text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Button asChild size="lg">
+              <Link to="/scan">Try it with a sample label</Link>
+            </Button>
+            <Button asChild size="lg" variant="ghost">
+              <Link to="/explore">Browse the ingredient index</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <SectionHeading
+          eyebrow="Trust"
+          icon={Scale}
+          title="Honest about limits"
+          description="LabelLens will tell you when a label is unreadable, when an ingredient isn't in the knowledge base and when regulatory information is insufficient. Missing information is never presented as a warning."
+        />
+        <Disclaimer className="mt-8 max-w-3xl" />
+      </section>
+    </PageShell>
   );
 }
