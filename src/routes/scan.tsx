@@ -365,24 +365,47 @@ function ScanPage() {
                 </TabsContent>
 
                 <TabsContent value="photo" className="mt-5">
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => fileRef.current?.click()}
-                    className="hover-lift group flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-primary/25 bg-secondary/40 px-6 py-12 text-center"
-                  >
-                    <span className="animate-pulse-ring flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                      <ImageIcon className="size-7" aria-hidden="true" />
-                    </span>
-                    <span className="font-medium">
-                      Upload or take a photo of the ingredient panel
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      JPG or PNG up to 8 MB · fill the frame with the ingredient list
-                    </span>
-                  </button>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => fileRef.current?.click()}
+                      className="hover-lift group flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-primary/25 bg-secondary/40 px-6 py-10 text-center"
+                    >
+                      <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                        <ImageIcon className="size-6" aria-hidden="true" />
+                      </span>
+                      <span className="font-medium">Upload from gallery</span>
+                      <span className="text-xs text-muted-foreground">Pick a saved ingredient-panel photo</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => cameraRef.current?.click()}
+                      className="hover-lift group flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-primary/25 bg-secondary/40 px-6 py-10 text-center"
+                    >
+                      <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                        <Camera className="size-6" aria-hidden="true" />
+                      </span>
+                      <span className="font-medium">Take a photo</span>
+                      <span className="text-xs text-muted-foreground">Open the camera and snap the label</span>
+                    </button>
+                  </div>
+
                   <input
                     ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) handleFile(file);
+                      event.target.value = "";
+                    }}
+                  />
+                  <input
+                    ref={cameraRef}
                     type="file"
                     accept="image/*"
                     capture="environment"
@@ -401,7 +424,7 @@ function ScanPage() {
                     />
                   ) : null}
                   <p className="mt-3 text-xs text-muted-foreground">
-                    Images are used only to extract label text for this analysis.
+                    Images are used only to extract label text for this analysis. Fill the frame with the ingredient list for best OCR results.
                   </p>
                 </TabsContent>
 
