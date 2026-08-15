@@ -141,7 +141,7 @@ export type SourceAttribution = {
 
 export type AnalysisReport = {
   input: {
-    method: "image" | "manual" | "demo";
+    method: "image" | "manual" | "text" | "barcode" | "demo";
     rawText: string;
     ocrConfidence: number | null;
     productName: string | null;
