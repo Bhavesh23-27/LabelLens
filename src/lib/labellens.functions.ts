@@ -87,6 +87,28 @@ export const runLabelOcr = createServerFn({ method: "POST" })
     }
   });
 
+/* ------------------------------ barcode lookup ------------------------------ */
+
+export const lookupBarcode = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => barcodeSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { lookupBarcodeOnOpenFoodFacts } = await import("@/lib/barcode.server");
+    const result = await lookupBarcodeOnOpenFoodFacts(data.barcode);
+    if (!result.ok) {
+      return { ok: false as const, code: "BARCODE_NOT_FOUND", message: result.message };
+    }
+    if (!result.product.ingredientsText || result.product.ingredientsText.length < 12) {
+      return {
+        ok: false as const,
+        code: "NO_INGREDIENT_LIST",
+        message:
+          "That product exists in the open database, but it has no ingredient list recorded yet. Photograph the panel instead.",
+        product: result.product,
+      };
+    }
+    return { ok: true as const, product: result.product };
+  });
+
 /* ----------------------------- analysis pipeline ---------------------------- */
 
 export const analyzeProduct = createServerFn({ method: "POST" })
