@@ -49,12 +49,12 @@ function AdminPage() {
           <>
             <dl className="mt-8 grid gap-4 sm:grid-cols-3">
               {[
-                ["Scans", data.stats.scans],
-                ["Analyses", data.stats.analyses],
-                ["Ingredients in KB", data.stats.ingredients],
-                ["Unmatched queue", data.stats.unknowns],
-                ["Avg Insight Score", data.stats.averageScore],
-                ["Avg confidence", `${Math.round((data.stats.averageConfidence ?? 0) * 100)}%`],
+                ["Scans", data.totalScans],
+                ["Analyses", data.totalAnalyses],
+                ["Ingredients in KB", data.ingredientCount],
+                ["Unmatched queue", data.unknownQueue.length],
+                ["Avg Insight Score", data.averageScore ?? "—"],
+                ["Low-confidence analyses", data.lowConfidenceAnalyses],
               ].map(([label, value]) => (
                 <div key={String(label)} className="surface p-4">
                   <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -65,14 +65,35 @@ function AdminPage() {
               ))}
             </dl>
 
+            <h2 className="mt-12 font-display text-xl font-semibold">Processing distribution</h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-4">
+              {data.novaDistribution.map((entry) => (
+                <li key={entry.novaClass} className="surface p-4">
+                  <p className="text-xs text-muted-foreground">NOVA {entry.novaClass}</p>
+                  <p className="mt-1 font-display text-xl font-semibold">{entry.count}</p>
+                </li>
+              ))}
+            </ul>
+
+            <h2 className="mt-12 font-display text-xl font-semibold">Most common findings</h2>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {data.topFlags.map((flag) => (
+                <li key={flag.code}>
+                  <StatusPill severity="neutral">
+                    {flag.code.replaceAll("_", " ")} · {flag.count}
+                  </StatusPill>
+                </li>
+              ))}
+            </ul>
+
             <h2 className="mt-12 font-display text-xl font-semibold">Review queue</h2>
             <ul className="mt-4 space-y-2">
-              {data.unknowns.length === 0 ? (
+              {data.unknownQueue.length === 0 ? (
                 <li className="surface p-4 text-sm text-muted-foreground">
                   Nothing awaiting review.
                 </li>
               ) : null}
-              {data.unknowns.map((row) => (
+              {data.unknownQueue.map((row) => (
                 <li key={row.id as string} className="surface flex items-center justify-between gap-3 p-4">
                   <span>
                     <span className="font-medium">{row.raw_name as string}</span>
@@ -86,6 +107,7 @@ function AdminPage() {
                 </li>
               ))}
             </ul>
+
           </>
         ) : null}
       </div>
