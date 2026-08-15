@@ -320,9 +320,10 @@ export const saveAnalysis = createServerFn({ method: "POST" })
         confidence: report.confidence.value,
         ingredient_count: report.ingredients.length,
         additive_count: report.ingredients.filter((i) => i.knowledge?.ins_number).length,
-        report: report as unknown as Record<string, unknown>,
-        flags: report.flags as unknown as Record<string, unknown>[],
-        nutrition: report.nutrition as unknown as Record<string, unknown> | null,
+        report: JSON.parse(JSON.stringify(report)),
+        flags: JSON.parse(JSON.stringify(report.flags)),
+        nutrition: report.nutrition ? JSON.parse(JSON.stringify(report.nutrition)) : null,
+
         ai_explanation: report.aiExplanation,
         is_demo: report.isDemo,
       })
@@ -484,10 +485,15 @@ export const adminSaveIngredient = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const payload = { ...data, is_seed_data: false };
-    const result = data.id
-      ? await supabaseAdmin.from("ingredients").update(payload).eq("id", data.id)
-      : await supabaseAdmin.from("ingredients").insert(payload);
+    const { id, ...fields } = data;
+    const payload: Record<string, unknown> = { is_seed_data: false };
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined) payload[key] = value;
+    }
+    const result = id
+      ? await supabaseAdmin.from("ingredients").update(payload as never).eq("id", id)
+      : await supabaseAdmin.from("ingredients").insert(payload as never);
+
     if (result.error) throw new Error(result.error.message);
     return { ok: true as const };
   });
