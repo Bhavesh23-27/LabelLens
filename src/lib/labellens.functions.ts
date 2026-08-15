@@ -44,6 +44,17 @@ const ocrSchema = z.object({
     ),
 });
 
+const barcodeSchema = z.object({
+  barcode: z
+    .string()
+    .trim()
+    .transform((value) => value.replace(/[^0-9]/g, ""))
+    .refine(
+      (value) => value.length >= 8 && value.length <= 14,
+      "Enter the 8–14 digit barcode number printed under the bars.",
+    ),
+});
+
 const reportSchema = z.object({
   report: z.custom<AnalysisReport>(
     (value) =>
