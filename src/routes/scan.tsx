@@ -181,8 +181,8 @@ function ScanPage() {
         rawText: product.ingredientsText ?? "",
         method: "barcode",
         nutrition: product.nutrition,
-        name: product.productName ?? undefined,
-        brandName: product.brand ?? undefined,
+        name: product.productName ?? "",
+        brandName: product.brand ?? "",
       });
     },
     onError: () => setNotice("Couldn't look up that barcode. Please try again."),
