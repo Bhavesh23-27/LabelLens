@@ -26,7 +26,7 @@ const nutritionSchema = z
 
 const analyzeSchema = z.object({
   text: z.string().trim().min(3, "Please provide an ingredient list.").max(8000),
-  method: z.enum(["image", "manual", "demo"]).default("manual"),
+  method: z.enum(["image", "manual", "text", "barcode", "demo"]).default("manual"),
   productName: z.string().trim().max(160).nullable().optional(),
   brand: z.string().trim().max(160).nullable().optional(),
   ocrConfidence: z.number().min(0).max(1).nullable().optional(),
