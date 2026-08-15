@@ -299,6 +299,9 @@ export function AnalysisDashboard({ report }: { report: AnalysisReport }) {
         </p>
       </section>
 
+      <ConsumerReport report={report} />
+
+      <TechnicalSection>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card
           title="Ingredients"
