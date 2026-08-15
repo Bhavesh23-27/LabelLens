@@ -536,6 +536,7 @@ export function AnalysisDashboard({ report }: { report: AnalysisReport }) {
           ))}
         </ul>
       </section>
+      </TechnicalSection>
 
       <AskPanel report={report} />
 
