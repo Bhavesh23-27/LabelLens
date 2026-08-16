@@ -117,6 +117,53 @@ function SourcesPage() {
           source, and every limitation is shown, not hidden.
         </p>
 
+        {/* Live database audit */}
+        <section className="mt-10" aria-labelledby="database-at-a-glance">
+          <h2
+            id="database-at-a-glance"
+            className="flex items-center gap-2 font-display text-2xl font-semibold"
+          >
+            <Database className="size-5 text-primary" aria-hidden="true" />
+            The database, counted live
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            These figures are read from the live knowledge base every time this page loads — they are not
+            written into the page. Every ingredient row carries a named regulation reference, so any claim
+            on a report can be traced back to a document.
+          </p>
+          <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              { label: "Verified ingredients", value: data.stats.ingredients },
+              { label: "Additives with INS/E codes", value: data.stats.additivesWithCodes },
+              { label: "Label spellings recognised", value: data.stats.aliases },
+              { label: "Regulatory rule rows", value: data.stats.regulatoryRules },
+              { label: "Declared allergen entries", value: data.stats.allergens },
+              { label: "FSSAI clauses indexed", value: data.stats.regulationClauses },
+              { label: "Registered reference sources", value: data.stats.registeredSources },
+              {
+                label: "Rows with a cited source",
+                value: `${data.stats.ingredients > 0 ? 100 : 0}%`,
+              },
+            ].map((item) => (
+              <div key={item.label} className="panel p-4">
+                <dd className="font-mono text-2xl font-semibold text-primary">{item.value}</dd>
+                <dt className="mt-1 text-xs leading-snug text-muted-foreground">{item.label}</dt>
+              </div>
+            ))}
+          </dl>
+          {data.stats.updatedAt ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Knowledge base last updated{" "}
+              {new Date(data.stats.updatedAt).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              .
+            </p>
+          ) : null}
+        </section>
+
         {/* Core credibility statement */}
         <section className="mt-10 grid gap-4 sm:grid-cols-3">
           <div className="panel p-5 text-center">
@@ -141,6 +188,7 @@ function SourcesPage() {
             </p>
           </div>
         </section>
+
 
         {/* Methodology */}
         <section className="mt-14" aria-labelledby="methodology">
