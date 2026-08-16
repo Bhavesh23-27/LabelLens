@@ -5,6 +5,7 @@ import {
   Database,
   ExternalLink,
   Leaf,
+  ScanText,
   ScrollText,
   ShieldCheck,
 } from "lucide-react";
