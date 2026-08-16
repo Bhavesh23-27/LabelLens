@@ -1,4 +1,13 @@
-import { AlertTriangle, CheckCircle2, CircleAlert, Leaf, ScrollText, ShieldCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  CircleAlert,
+  Database,
+  Leaf,
+  ScrollText,
+  ShieldCheck,
+} from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { StatusPill, regulatoryPresentation } from "@/components/labellens/status";
 import type { AnalysisReport, MatchedIngredient } from "@/lib/engine/types";
@@ -128,6 +137,65 @@ function buildInsights(report: AnalysisReport) {
   return insights;
 }
 
+function TrustPanel({ report }: { report: AnalysisReport }) {
+  const identified = report.ingredients.filter((i) => i.knowledge).length;
+  const fssaiMatched = report.ingredients.filter((i) => i.regulatory).length;
+  const verifiedSources = report.sources.filter((s) => !s.is_seed_data).length;
+  const totalSources = report.sources.length;
+
+  return (
+    <div className="rounded-xl border border-border bg-card/60 p-5">
+      <div className="flex items-center gap-2">
+        <Database className="size-4 text-primary" aria-hidden="true" />
+        <h3 className="font-display font-semibold">Why trust this result?</h3>
+      </div>
+      <ul className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+        <li className="flex items-start gap-2">
+          <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          <span>
+            <strong className="text-foreground">{fssaiMatched}</strong> of{" "}
+            <strong className="text-foreground">{report.ingredients.length}</strong> ingredients matched a
+            referenced FSSAI rule.
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <Database className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          <span>
+            Based on{" "}
+            <strong className="text-foreground">
+              {totalSources} source{totalSources === 1 ? "" : "s"}
+            </strong>
+            {verifiedSources > 0 ? ` (${verifiedSources} verified)` : ""}.
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          <span>
+            Confidence: <strong className="text-foreground">{report.confidence.note}</strong>
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <ScrollText className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          <span>
+            Knowledge base updated{" "}
+            {report.knowledgeBaseUpdatedAt
+              ? new Date(report.knowledgeBaseUpdatedAt).toLocaleDateString()
+              : "—"}
+            .
+          </span>
+        </li>
+      </ul>
+      <p className="mt-4 text-xs text-muted-foreground">
+        LabelLens uses a deterministic pipeline — NOVA for processing and FSSAI for regulatory rules.{" "}
+        <Link to="/sources" className="text-primary hover:underline">
+          See our methodology and sources
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}
+
 /* --------------------------------- component -------------------------------- */
 
 export function ConsumerReport({ report }: { report: AnalysisReport }) {
@@ -196,6 +264,8 @@ export function ConsumerReport({ report }: { report: AnalysisReport }) {
           </div>
         </div>
       </section>
+
+      <TrustPanel report={report} />
 
       {/* Health insights */}
       <section aria-labelledby="health-insights">
