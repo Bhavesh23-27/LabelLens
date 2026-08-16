@@ -1,4 +1,13 @@
-import { AlertTriangle, CheckCircle2, CircleAlert, Leaf, ScrollText, ShieldCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  CircleAlert,
+  Database,
+  Leaf,
+  ScrollText,
+  ShieldCheck,
+} from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { StatusPill, regulatoryPresentation } from "@/components/labellens/status";
 import type { AnalysisReport, MatchedIngredient } from "@/lib/engine/types";
