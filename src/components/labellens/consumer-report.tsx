@@ -352,6 +352,17 @@ export function ConsumerReport({ report }: { report: AnalysisReport }) {
                       INS {item.parsed.insNumber}
                     </span>
                   ) : null}
+                  {item.knowledge ? (
+                    <StatusPill severity="verified">
+                      <Database className="size-3" aria-hidden="true" />
+                      Matched in database
+                    </StatusPill>
+                  ) : (
+                    <StatusPill severity="neutral">
+                      <ScanText className="size-3" aria-hidden="true" />
+                      Not identified
+                    </StatusPill>
+                  )}
                   <StatusPill severity={reg.severity}>{reg.label}</StatusPill>
                   {item.knowledge?.allergen_flag ? (
                     <StatusPill severity="concern">
