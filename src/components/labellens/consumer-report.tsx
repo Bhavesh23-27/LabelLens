@@ -265,6 +265,8 @@ export function ConsumerReport({ report }: { report: AnalysisReport }) {
         </div>
       </section>
 
+      <TrustPanel report={report} />
+
       {/* Health insights */}
       <section aria-labelledby="health-insights">
         <h2 id="health-insights" className="font-display text-xl font-semibold">
