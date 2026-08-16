@@ -108,21 +108,47 @@ function ScanPage() {
 
     if (options.imageDataUrl) {
       setStep(1);
+      let text = "";
+      let conf = 0;
+      let lowConfidence = false;
       const result = await ocr({ data: { imageDataUrl: options.imageDataUrl } });
-      if (!result.ok) {
-        setStep(-1);
-        setNotice(result.message);
-        return;
+
+      if (result.ok) {
+        text = result.text;
+        conf = result.confidence;
+        lowConfidence = Boolean(result.lowConfidence);
+      } else {
+        // No server OCR provider available — fall back to on-device OCR.
+        try {
+          const { runBrowserOcr } = await import("@/lib/ocr-browser");
+          const local = await runBrowserOcr(options.imageDataUrl);
+          if (!local.text || local.text.length < 12) {
+            setStep(-1);
+            setNotice(
+              "We couldn't read enough text from that photo. Try a sharper, well-lit close-up of the ingredients list, or paste the text instead.",
+            );
+            return;
+          }
+          text = local.text;
+          conf = local.confidence;
+          lowConfidence = local.confidence < 0.7;
+        } catch {
+          setStep(-1);
+          setNotice(result.message);
+          return;
+        }
       }
-      labelText = result.text;
-      confidence = result.confidence;
-      if (result.lowConfidence) {
+
+      labelText = text;
+      confidence = conf;
+      if (lowConfidence) {
         setNotice(
           "The text was hard to read (low OCR confidence). Please check the ingredient list below against the pack.",
         );
       }
-      setText(result.text);
+      setText(text);
     }
+
 
     setStep(2);
     await new Promise((r) => setTimeout(r, 250));
