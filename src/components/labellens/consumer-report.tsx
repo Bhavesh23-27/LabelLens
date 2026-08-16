@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   CircleAlert,
   Database,
+  ExternalLink,
   Leaf,
   ScrollText,
   ShieldCheck,
@@ -63,6 +64,17 @@ function ingredientMeaning(item: MatchedIngredient): string {
   const text = k.consumer_explanation ?? k.why_used ?? k.description;
   if (text) return text;
   return `${k.category}${k.functional_class ? ` — used as ${k.functional_class.toLowerCase()}` : ""}.`;
+}
+
+function ingredientSource(item: MatchedIngredient): {
+  url: string | null;
+  label: string | null;
+} {
+  const ref =
+    item.regulatory?.regulation_reference ?? item.knowledge?.source_reference ?? null;
+  if (!ref) return { url: null, label: null };
+  if (/^https?:\/\//i.test(ref)) return { url: ref, label: "View source" };
+  return { url: null, label: ref };
 }
 
 function buildInsights(report: AnalysisReport) {
@@ -312,6 +324,7 @@ export function ConsumerReport({ report }: { report: AnalysisReport }) {
             const reg = regulatoryPresentation(
               item.regulatory?.permission_status ?? item.knowledge?.fssai_status,
             );
+            const source = ingredientSource(item);
             return (
               <li key={`${item.parsed.displayName}-${index}`} className="px-5 py-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -333,6 +346,32 @@ export function ConsumerReport({ report }: { report: AnalysisReport }) {
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                   {ingredientMeaning(item)}
                 </p>
+                {source.label ? (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                    {source.url ? (
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-primary hover:underline"
+                      >
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                        {source.label}
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">
+                        <ScrollText className="size-3" aria-hidden="true" />
+                        Source: {source.label}
+                      </span>
+                    )}
+                    {item.regulatory?.condition ? (
+                      <span className="text-border">·</span>
+                    ) : null}
+                    {item.regulatory?.condition ? (
+                      <span>Condition: {item.regulatory.condition}</span>
+                    ) : null}
+                  </div>
+                ) : null}
               </li>
             );
           })}
