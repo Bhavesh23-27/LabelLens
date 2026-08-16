@@ -252,6 +252,21 @@ export function ConsumerReport({ report }: { report: AnalysisReport }) {
           <StatusPill severity="neutral">
             {report.ingredients.length} ingredient{report.ingredients.length === 1 ? "" : "s"} read
           </StatusPill>
+          {report.input.method === "image" && report.input.ocrConfidence !== null ? (
+            <StatusPill
+              severity={
+                report.input.ocrConfidence >= 0.8
+                  ? "verified"
+                  : report.input.ocrConfidence >= 0.6
+                    ? "attention"
+                    : "concern"
+              }
+            >
+              <ScanText className="size-3" aria-hidden="true" />
+              OCR {Math.round(report.input.ocrConfidence * 100)}%
+              {report.input.ocrConfidence < 0.6 ? " — please check" : ""}
+            </StatusPill>
+          ) : null}
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
