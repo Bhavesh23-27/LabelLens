@@ -35,10 +35,20 @@ Six keys are needed — `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`,
 They are publishable/anon keys and safe to commit. The service-role key and the
 database password are never needed locally and are not available.
 
-The AI explanation step calls the hosted AI gateway. When `LOVABLE_API_KEY` is
-absent locally, the app still returns the complete deterministic analysis —
-parsing, matching, regulatory status, NOVA, allergens, score — and only omits
-the AI-written paragraph, with a reason shown in the report.
+### What needs `LOVABLE_API_KEY` locally
+
+Two features call the hosted AI gateway and need `LOVABLE_API_KEY` in `.env`
+(it is injected automatically in the hosted environment, so it is not committed):
+
+- **Photo scan / OCR** — without the key it reports that no OCR provider is
+  configured.
+- **AI explanation paragraph** — without the key the report shows an
+  "AI unavailable" reason instead.
+
+Everything else works offline from the key: **manual paste** and **barcode
+lookup** both run the full deterministic pipeline — parsing, knowledge-base
+matching, regulatory status, NOVA, allergens, concerns and the Insight Score.
+
 
 ### Scripts
 
