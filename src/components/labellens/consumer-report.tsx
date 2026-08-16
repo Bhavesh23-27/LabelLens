@@ -66,6 +66,17 @@ function ingredientMeaning(item: MatchedIngredient): string {
   return `${k.category}${k.functional_class ? ` — used as ${k.functional_class.toLowerCase()}` : ""}.`;
 }
 
+function ingredientSource(item: MatchedIngredient): {
+  url: string | null;
+  label: string | null;
+} {
+  const ref =
+    item.regulatory?.regulation_reference ?? item.knowledge?.source_reference ?? null;
+  if (!ref) return { url: null, label: null };
+  if (/^https?:\/\//i.test(ref)) return { url: ref, label: "View source" };
+  return { url: null, label: ref };
+}
+
 function buildInsights(report: AnalysisReport) {
   const insights: { icon: "leaf" | "alert" | "check"; title: string; detail: string }[] = [];
 
