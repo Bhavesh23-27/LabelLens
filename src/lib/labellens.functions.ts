@@ -303,12 +303,44 @@ export const getIngredientDetail = createServerFn({ method: "POST" })
 export const listRegulations = createServerFn({ method: "GET" }).handler(async () => {
   const { createPublicClient } = await import("@/lib/knowledge.server");
   const client = createPublicClient();
-  const [regs, sources] = await Promise.all([
-    client.from("fssai_regulations").select("*").order("regulation_name").limit(200),
-    client.from("data_sources").select("*").order("source_name"),
-  ]);
-  return { regulations: regs.data ?? [], sources: sources.data ?? [] };
+  const [regs, sources, ingredientCount, additiveCount, allergenCount, aliasCount, ruleCount, freshness] =
+    await Promise.all([
+      client.from("fssai_regulations").select("*").order("regulation_name").limit(200),
+      client.from("data_sources").select("*").order("source_name"),
+      client.from("ingredients").select("id", { count: "exact", head: true }),
+      client
+        .from("ingredients")
+        .select("id", { count: "exact", head: true })
+        .not("ins_number", "is", null),
+      client
+        .from("ingredients")
+        .select("id", { count: "exact", head: true })
+        .eq("allergen_flag", true),
+      client.from("ingredient_aliases").select("id", { count: "exact", head: true }),
+      client.from("fssai_ingredient_rules").select("id", { count: "exact", head: true }),
+      client
+        .from("ingredients")
+        .select("updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(1),
+    ]);
+
+  return {
+    regulations: regs.data ?? [],
+    sources: sources.data ?? [],
+    stats: {
+      ingredients: ingredientCount.count ?? 0,
+      additivesWithCodes: additiveCount.count ?? 0,
+      allergens: allergenCount.count ?? 0,
+      aliases: aliasCount.count ?? 0,
+      regulatoryRules: ruleCount.count ?? 0,
+      regulationClauses: regs.data?.length ?? 0,
+      registeredSources: sources.data?.length ?? 0,
+      updatedAt: freshness.data?.[0]?.updated_at ?? null,
+    },
+  };
 });
+
 
 /* --------------------------- history (authenticated) ------------------------ */
 
