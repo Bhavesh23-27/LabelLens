@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   CircleAlert,
   Database,
+  ExternalLink,
   Leaf,
   ScrollText,
   ShieldCheck,
