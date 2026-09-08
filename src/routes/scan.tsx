@@ -26,7 +26,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
 import { SAMPLE_PASTE } from "@/lib/demo-labels";
-import { addLocalScan } from "@/lib/local-history";
 import type { AnalysisReport, NutritionFacts } from "@/lib/engine/types";
 import {
   analyzeProduct,
@@ -181,7 +180,6 @@ function ScanPage() {
 
     setStep(PIPELINE_STEPS.length);
     setReport(withExplanation);
-    addLocalScan(withExplanation, options.name ?? productName, options.brandName ?? brand);
   }
 
   const pipeline = useMutation({
