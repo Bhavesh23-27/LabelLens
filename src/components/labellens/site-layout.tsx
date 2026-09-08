@@ -59,9 +59,16 @@ export function SiteHeader() {
             </Button>
           ) : null}
           {isAuthenticated ? (
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/saved">My scans</Link>
-            </Button>
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/saved">My scans</Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" aria-label="Account">
+                <Link to="/account">
+                  <UserRound className="size-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </>
           ) : (
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/auth">Sign in</Link>
