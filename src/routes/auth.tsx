@@ -112,7 +112,13 @@ function AuthPage() {
           provider: "google",
           options: { redirectTo, queryParams: { prompt: "select_account" } },
         });
-        if (error) throw error;
+        if (error) {
+          toast.error(
+            /secret|provider/i.test(error.message)
+              ? "Google sign-in isn't set up for local use yet. Sign in with email and password here."
+              : error.message,
+          );
+        }
         return;
       }
 
