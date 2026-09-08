@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SourcesRouteImport } from './routes/sources'
@@ -44,6 +45,11 @@ const CompareRoute = CompareRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/explore': typeof ExploreRoute
+  '/history': typeof HistoryRoute
   '/how-it-works': typeof HowItWorksRoute
   '/scan': typeof ScanRoute
   '/sources': typeof SourcesRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/explore': typeof ExploreRoute
+  '/history': typeof HistoryRoute
   '/how-it-works': typeof HowItWorksRoute
   '/scan': typeof ScanRoute
   '/sources': typeof SourcesRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/explore': typeof ExploreRoute
+  '/history': typeof HistoryRoute
   '/how-it-works': typeof HowItWorksRoute
   '/scan': typeof ScanRoute
   '/sources': typeof SourcesRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/explore'
+    | '/history'
     | '/how-it-works'
     | '/scan'
     | '/sources'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/explore'
+    | '/history'
     | '/how-it-works'
     | '/scan'
     | '/sources'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/explore'
+    | '/history'
     | '/how-it-works'
     | '/scan'
     | '/sources'
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
   ExploreRoute: typeof ExploreRoute
+  HistoryRoute: typeof HistoryRoute
   HowItWorksRoute: typeof HowItWorksRoute
   ScanRoute: typeof ScanRoute
   SourcesRoute: typeof SourcesRoute
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -289,6 +309,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
   ExploreRoute: ExploreRoute,
+  HistoryRoute: HistoryRoute,
   HowItWorksRoute: HowItWorksRoute,
   ScanRoute: ScanRoute,
   SourcesRoute: SourcesRoute,

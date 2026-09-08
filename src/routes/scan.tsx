@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   AlertTriangle,
@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
 import { SAMPLE_PASTE } from "@/lib/demo-labels";
+import { addLocalScan } from "@/lib/local-history";
 import type { AnalysisReport, NutritionFacts } from "@/lib/engine/types";
 import {
   analyzeProduct,
@@ -180,6 +181,7 @@ function ScanPage() {
 
     setStep(PIPELINE_STEPS.length);
     setReport(withExplanation);
+    addLocalScan(withExplanation, options.name ?? productName, options.brandName ?? brand);
   }
 
   const pipeline = useMutation({
@@ -523,6 +525,9 @@ function ScanPage() {
                   }}
                 >
                   Analyse another product
+                </Button>
+                <Button asChild variant="ghost">
+                  <Link to="/history">View scan history</Link>
                 </Button>
                 {isAuthenticated ? (
                   <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
