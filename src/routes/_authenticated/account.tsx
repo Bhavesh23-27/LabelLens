@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -21,6 +22,15 @@ export const Route = createFileRoute("/_authenticated/account")({
 function AccountPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    navigate({ to: "/", replace: true });
+  }
 
   return (
     <PageShell>
@@ -39,15 +49,7 @@ function AccountPage() {
             during an analysis and are not stored.
           </p>
         </div>
-        <Button
-          className="mt-6"
-          variant="outline"
-          onClick={async () => {
-            await supabase.auth.signOut();
-            toast.success("Signed out");
-            navigate({ to: "/" });
-          }}
-        >
+        <Button className="mt-6" variant="outline" onClick={handleSignOut}>
           Sign out
         </Button>
       </div>
