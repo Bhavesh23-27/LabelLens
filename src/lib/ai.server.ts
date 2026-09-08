@@ -19,7 +19,7 @@ type ChatMessage = {
 };
 
 async function callGateway(messages: ChatMessage[]): Promise<string> {
-  const key = process.env["LOVABLE_API_KEY"];
+  const key = process.env["AI_API_KEY"] ?? process.env["LOVABLE_API_KEY"];
   if (!key) throw new AiUnavailableError("AI is not configured for this project.");
 
   const response = await fetch(GATEWAY, {
@@ -128,7 +128,7 @@ export async function runOcr(imageDataUrl: string): Promise<{
   confidence: number;
   provider: string;
 }> {
-  const key = process.env["LOVABLE_API_KEY"];
+  const key = process.env["AI_API_KEY"] ?? process.env["LOVABLE_API_KEY"];
   if (!key) throw new AiUnavailableError("OCR_UNAVAILABLE: no OCR provider configured.");
 
   const response = await fetch(GATEWAY, {

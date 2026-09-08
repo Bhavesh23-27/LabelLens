@@ -47,4 +47,3 @@ npm start
 | `src/lib` | The analysis brain: parser, matcher, NOVA, scoring |
 | `public` | Files served as-is (the tab icon lives here) |
 | `supabase` | Database setup for the ingredient knowledge base |
-| `.lovable` | Small internal marker file — you can ignore it |
