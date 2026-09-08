@@ -21,6 +21,15 @@ if errorlevel 1 (
   exit /b 1
 )
 
+if not exist ".env" (
+  if not exist ".env.example" (
+    echo ERROR: The LabelLens settings file is missing.
+    pause
+    exit /b 1
+  )
+  copy /y ".env.example" ".env" >nul
+)
+
 echo.
 echo Preparing LabelLens...
 echo This may take a few minutes after downloading an update.
