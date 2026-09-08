@@ -665,7 +665,7 @@ export const adminListReports = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin
       .from("analysis_results")
       .select(
-        "id,insight_score,nova_class,verdict,confidence,flags,ingredient_count,additive_count,is_demo,created_at,product_scans(product_name,brand,input_method,created_at),profiles!inner(display_name)",
+        "id,user_id,insight_score,nova_class,verdict,confidence,flags,ingredient_count,additive_count,is_demo,created_at,product_scans(product_name,brand,input_method,created_at)",
       )
       .order("created_at", { ascending: false })
       .limit(100);
