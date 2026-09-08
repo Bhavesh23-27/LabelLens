@@ -54,6 +54,13 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const destination = safePath(search.redirect);
   const { isAuthenticated, loading } = useAuth();
+  const [isLocalHost, setIsLocalHost] = useState(false);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    setIsLocalHost(host === "localhost" || host === "127.0.0.1" || host === "[::1]");
+  }, []);
+
 
   // Already signed in (including right after a Google redirect back here) — move on.
   useEffect(() => {
