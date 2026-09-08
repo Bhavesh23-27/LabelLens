@@ -290,7 +290,7 @@ function AdminPage() {
                 input_method?: string | null;
                 created_at?: string | null;
               } | null;
-              const profile = row.profiles as { display_name?: string | null } | null;
+              const userId = (row.user_id as string) ?? "";
               return (
                 <li
                   key={row.id as string}
@@ -302,7 +302,7 @@ function AdminPage() {
                     </span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {scan?.brand ?? "Brand not given"} ·{" "}
-                      {profile?.display_name ?? "Unknown user"} ·{" "}
+                      {userId ? `User ${userId.slice(0, 8)}…` : "Unknown user"} ·{" "}
                       {new Date(row.created_at as string).toLocaleString()}
                     </span>
                     <span className="mt-2 flex flex-wrap gap-2">
