@@ -19,7 +19,7 @@ import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedAnalysisIdRouteImport } from './routes/_authenticated/analysis.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,9 +71,9 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
+const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAnalysisIdRoute = AuthenticatedAnalysisIdRouteImport.update({
@@ -92,7 +92,7 @@ export interface FileRoutesByFullPath {
   '/sources': typeof SourcesRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/history': typeof AuthenticatedHistoryRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/analysis/$id': typeof AuthenticatedAnalysisIdRoute
 }
 export interface FileRoutesByTo {
@@ -105,7 +105,7 @@ export interface FileRoutesByTo {
   '/sources': typeof SourcesRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/history': typeof AuthenticatedHistoryRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/analysis/$id': typeof AuthenticatedAnalysisIdRoute
 }
 export interface FileRoutesById {
@@ -120,7 +120,7 @@ export interface FileRoutesById {
   '/sources': typeof SourcesRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/_authenticated/analysis/$id': typeof AuthenticatedAnalysisIdRoute
 }
 export interface FileRouteTypes {
@@ -135,7 +135,7 @@ export interface FileRouteTypes {
     | '/sources'
     | '/account'
     | '/admin'
-    | '/history'
+    | '/saved'
     | '/analysis/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -148,7 +148,7 @@ export interface FileRouteTypes {
     | '/sources'
     | '/account'
     | '/admin'
-    | '/history'
+    | '/saved'
     | '/analysis/$id'
   id:
     | '__root__'
@@ -162,7 +162,7 @@ export interface FileRouteTypes {
     | '/sources'
     | '/_authenticated/account'
     | '/_authenticated/admin'
-    | '/_authenticated/history'
+    | '/_authenticated/saved'
     | '/_authenticated/analysis/$id'
   fileRoutesById: FileRoutesById
 }
@@ -249,11 +249,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/history': {
-      id: '/_authenticated/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+    '/_authenticated/saved': {
+      id: '/_authenticated/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthenticatedSavedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/analysis/$id': {
@@ -269,14 +269,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
   AuthenticatedAnalysisIdRoute: typeof AuthenticatedAnalysisIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedSavedRoute: AuthenticatedSavedRoute,
   AuthenticatedAnalysisIdRoute: AuthenticatedAnalysisIdRoute,
 }
 
