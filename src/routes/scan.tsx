@@ -525,7 +525,7 @@ function ScanPage() {
                   Analyse another product
                 </Button>
                 <Button asChild variant="ghost">
-                  <Link to="/history">View scan history</Link>
+                  <Link to="/saved">View my scans</Link>
                 </Button>
                 {isAuthenticated ? (
                   <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
