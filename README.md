@@ -8,7 +8,7 @@ records, classifies processing with NOVA, and explains it all in plain language.
 
 ## Run it on your machine
 
-Requirements: **Node 20 or newer** (use the current LTS release) and Git.
+Requirements: **Node 22.12 or newer** (use the current LTS release) and Git.
 
 ```bash
 git clone https://github.com/<your-username>/<repo-name>.git labellens

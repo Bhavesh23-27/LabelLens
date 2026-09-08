@@ -11,9 +11,9 @@ if errorlevel 1 (
   exit /b 1
 )
 
-for /f "tokens=1 delims=." %%v in ('node -p "process.versions.node"') do set NODE_MAJOR=%%v
-if %NODE_MAJOR% LSS 20 (
-  echo ERROR: LabelLens needs Node.js 20 or newer.
+node -e "const [major,minor]=process.versions.node.split('.').map(Number); process.exit(major >= 22 && (major > 22 || minor >= 12) ? 0 : 1)"
+if errorlevel 1 (
+  echo ERROR: LabelLens needs Node.js 22.12 or newer.
   echo Your installed version is:
   node --version
   echo Download the current LTS version from https://nodejs.org

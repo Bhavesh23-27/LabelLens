@@ -23,7 +23,7 @@ npm install
 npm start
 ```
 
-Needs **Node 20 or newer** (check with `node -v`).
+Needs **Node 22.12 or newer** (check with `node -v`).
 
 ## Easiest option on Windows
 
