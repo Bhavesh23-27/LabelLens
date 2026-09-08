@@ -69,7 +69,7 @@ const reportSchema = z.object({
 /* ------------------------------- OCR pipeline ------------------------------- */
 
 export const runLabelOcr = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => ocrSchema.parse(input))
+  .validator((input: unknown) => ocrSchema.parse(input))
   .handler(async ({ data }) => {
     const { runOcr, AiUnavailableError } = await import("@/lib/ai.server");
     try {
@@ -101,7 +101,7 @@ export const runLabelOcr = createServerFn({ method: "POST" })
 /* ------------------------------ barcode lookup ------------------------------ */
 
 export const lookupBarcode = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => barcodeSchema.parse(input))
+  .validator((input: unknown) => barcodeSchema.parse(input))
   .handler(async ({ data }) => {
     const { lookupBarcodeOnOpenFoodFacts } = await import("@/lib/barcode.server");
     const result = await lookupBarcodeOnOpenFoodFacts(data.barcode);
@@ -123,7 +123,7 @@ export const lookupBarcode = createServerFn({ method: "POST" })
 /* ----------------------------- analysis pipeline ---------------------------- */
 
 export const analyzeProduct = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => analyzeSchema.parse(input))
+  .validator((input: unknown) => analyzeSchema.parse(input))
   .handler(async ({ data }) => {
     const { createPublicClient, loadKnowledge } = await import("@/lib/knowledge.server");
     const { runAnalysis } = await import("@/lib/engine");
@@ -199,7 +199,7 @@ export const analyzeProduct = createServerFn({ method: "POST" })
   });
 
 export const explainReport = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => reportSchema.parse(input))
+  .validator((input: unknown) => reportSchema.parse(input))
   .handler(async ({ data }) => {
     const { generateExplanation, AiUnavailableError } = await import("@/lib/ai.server");
     try {
@@ -216,7 +216,7 @@ export const explainReport = createServerFn({ method: "POST" })
   });
 
 export const askLabelLens = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     reportSchema
       .extend({ question: z.string().trim().min(3).max(500) })
       .parse(input),
@@ -239,7 +239,7 @@ export const askLabelLens = createServerFn({ method: "POST" })
 /* --------------------------------- search ---------------------------------- */
 
 export const searchKnowledge = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ query: z.string().trim().max(120).default("") }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -279,7 +279,7 @@ export const searchKnowledge = createServerFn({ method: "POST" })
   });
 
 export const getIngredientDetail = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
     const { createPublicClient } = await import("@/lib/knowledge.server");
     const client = createPublicClient();
@@ -346,7 +346,7 @@ export const listRegulations = createServerFn({ method: "GET" }).handler(async (
 
 export const saveAnalysis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     reportSchema
       .extend({
         productName: z.string().trim().max(160).nullable().optional(),
@@ -415,7 +415,7 @@ export const listHistory = createServerFn({ method: "GET" })
 
 export const getAnalysis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("analysis_results")
@@ -429,7 +429,7 @@ export const getAnalysis = createServerFn({ method: "POST" })
 
 export const deleteAnalysis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("analysis_results")
@@ -522,7 +522,7 @@ export const adminOverview = createServerFn({ method: "GET" })
 
 export const adminSaveIngredient = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string().uuid().optional(),
@@ -565,7 +565,7 @@ export const adminSaveIngredient = createServerFn({ method: "POST" })
 
 export const adminResolveUnknown = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -628,7 +628,7 @@ export const adminListAdmins = createServerFn({ method: "GET" })
 
 export const adminPromoteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(input))
+  .validator((input: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -654,7 +654,7 @@ export const adminPromoteUser = createServerFn({ method: "POST" })
 
 export const adminDemoteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -687,7 +687,7 @@ export const adminListReports = createServerFn({ method: "GET" })
 
 export const adminDeleteReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
