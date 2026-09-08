@@ -601,15 +601,27 @@ export const adminListAdmins = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("user_roles")
-      .select("id,role,user_id,created_at,profiles!inner(display_name,id)")
+      .select("id,role,user_id,created_at")
       .eq("role", "admin")
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return (data ?? []).map((row) => ({
+    const rows = data ?? [];
+    const ids = rows.map((r) => r.user_id as string);
+    const names = new Map<string, string>();
+    if (ids.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id,display_name")
+        .in("id", ids);
+      for (const p of profiles ?? []) {
+        names.set(p.id as string, (p.display_name as string | null) ?? "—");
+      }
+    }
+    return rows.map((row) => ({
       id: row.id as string,
       userId: row.user_id as string,
       role: row.role as string,
-      displayName: (row.profiles as { display_name?: string | null } | null)?.display_name ?? "—",
+      displayName: names.get(row.user_id as string) ?? "—",
       createdAt: row.created_at as string,
     }));
   });
