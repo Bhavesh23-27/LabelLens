@@ -593,3 +593,98 @@ export const checkIsAdmin = createServerFn({ method: "GET" })
     });
     return { isAdmin: Boolean(data) };
   });
+
+export const adminListAdmins = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("user_roles")
+      .select("id,role,user_id,created_at,profiles!inner(display_name,id)")
+      .eq("role", "admin")
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      id: row.id as string,
+      userId: row.user_id as string,
+      role: row.role as string,
+      displayName: (row.profiles as { display_name?: string | null } | null)?.display_name ?? "—",
+      createdAt: row.created_at as string,
+    }));
+  });
+
+export const adminPromoteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: user, error: userError } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("id", (await supabaseAdmin.auth.admin.listUsers()).users.find((u) => u.email === data.email)?.id ?? "")
+      .maybeSingle();
+
+    if (userError) throw new Error(userError.message);
+    if (!user?.id) throw new Error("No registered user found with that email.");
+
+    const { error } = await supabaseAdmin.from("user_roles").insert({ user_id: user.id, role: "admin" });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const adminDemoteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { count, error } = await supabaseAdmin
+      .from("user_roles")
+      .delete({ count: "exact" })
+      .eq("user_id", data.userId)
+      .eq("role", "admin");
+    if (error) throw new Error(error.message);
+    if (!count) throw new Error("User is not an admin.");
+    return { ok: true as const };
+  });
+
+export const adminListReports = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("analysis_results")
+      .select(
+        "id,insight_score,nova_class,verdict,confidence,flags,ingredient_count,additive_count,is_demo,created_at,product_scans(product_name,brand,input_method,created_at),profiles!inner(display_name)",
+      )
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const adminDeleteReport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: row, error: findError } = await supabaseAdmin
+      .from("analysis_results")
+      .select("scan_id")
+      .eq("id", data.id)
+      .single();
+    if (findError) throw new Error(findError.message);
+
+    await supabaseAdmin.from("analysis_results").delete().eq("id", data.id);
+    if (row?.scan_id) {
+      await supabaseAdmin.from("product_scans").delete().eq("id", row.scan_id);
+    }
+    return { ok: true as const };
+  });
