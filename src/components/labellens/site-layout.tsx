@@ -20,6 +20,7 @@ const NAV = [
   { to: "/scan", label: "Scan a product" },
   { to: "/explore", label: "Ingredient index" },
   { to: "/compare", label: "Compare" },
+  { to: "/history", label: "History" },
 ];
 
 const MOBILE_NAV = [
@@ -51,7 +52,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
             <Button asChild variant="ghost" size="sm">
-              <Link to="/history">My scans</Link>
+              <Link to="/saved">My scans</Link>
             </Button>
           ) : (
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
