@@ -5,6 +5,7 @@ import {
   Home,
   ScanLine,
   Shield,
+  ShieldCheck,
   SlidersHorizontal,
   UserRound,
 } from "lucide-react";
