@@ -111,6 +111,7 @@ export function MobileNav() {
 }
 
 export function SiteFooter() {
+  const { isAdmin, isAuthenticated } = useAuth();
   return (
     <footer className="mt-20 border-t border-border bg-secondary/40">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 md:grid-cols-4 md:px-6">
@@ -137,8 +138,14 @@ export function SiteFooter() {
           <h2 className="font-display text-sm font-semibold">Transparency</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li><Link to="/sources" className="hover:text-foreground">Data sources</Link></li>
-            <li><Link to="/admin" className="hover:text-foreground">Knowledge base admin</Link></li>
-            <li><Link to="/auth" className="hover:text-foreground">Sign in</Link></li>
+            {isAdmin ? (
+              <li><Link to="/admin" className="hover:text-foreground">Knowledge base admin</Link></li>
+            ) : null}
+            {isAuthenticated ? (
+              <li><Link to="/account" className="hover:text-foreground">Your account</Link></li>
+            ) : (
+              <li><Link to="/auth" className="hover:text-foreground">Sign in</Link></li>
+            )}
           </ul>
         </div>
       </div>
