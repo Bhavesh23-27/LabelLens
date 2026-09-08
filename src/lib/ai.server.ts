@@ -19,7 +19,7 @@ type ChatMessage = {
 };
 
 async function callGateway(messages: ChatMessage[]): Promise<string> {
-  const key = process.env["LOVABLE_API_KEY"];
+  const key = process.env["AI_API_KEY"] ?? process.env["LOVABLE_API_KEY"];
   if (!key) throw new AiUnavailableError("AI is not configured for this project.");
 
   const response = await fetch(GATEWAY, {
@@ -120,7 +120,7 @@ export async function answerQuestion(
 
 /**
  * OCR service boundary. Implemented today with a vision model through the
- * Lovable AI Gateway; can be swapped for any OCR provider without touching the
+  * Hosted AI gateway; can be swapped for any OCR provider without touching the
  * analysis engine.
  */
 export async function runOcr(imageDataUrl: string): Promise<{
@@ -128,7 +128,7 @@ export async function runOcr(imageDataUrl: string): Promise<{
   confidence: number;
   provider: string;
 }> {
-  const key = process.env["LOVABLE_API_KEY"];
+  const key = process.env["AI_API_KEY"] ?? process.env["LOVABLE_API_KEY"];
   if (!key) throw new AiUnavailableError("OCR_UNAVAILABLE: no OCR provider configured.");
 
   const response = await fetch(GATEWAY, {
@@ -187,7 +187,7 @@ export async function runOcr(imageDataUrl: string): Promise<{
       typeof parsed.confidence === "number"
         ? Math.max(0, Math.min(1, parsed.confidence))
         : 0.5,
-    provider: `lovable-ai-vision:${VISION_MODEL}`,
+    provider: `ai-vision:${VISION_MODEL}`,
   };
 }
 
