@@ -535,6 +535,7 @@ function ScanPage() {
                   variant="outline"
                   onClick={() => {
                     setReport(null);
+                    setSavedId(null);
                     setStep(-1);
                     setPreview(null);
                     setBarcodeSource(null);
@@ -546,10 +547,19 @@ function ScanPage() {
                   <Link to="/saved">View my scans</Link>
                 </Button>
                 {isAuthenticated ? (
-                  <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
-                    <Save className="size-4" aria-hidden="true" />
-                    Save to My scans
-                  </Button>
+                  savedId ? (
+                    <Button asChild variant="secondary">
+                      <Link to="/analysis/$id" params={{ id: savedId }}>
+                        <Save className="size-4" aria-hidden="true" />
+                        Saved — open full report
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
+                      <Save className="size-4" aria-hidden="true" />
+                      Save to My scans
+                    </Button>
+                  )
                 ) : (
                   <Button variant="secondary" onClick={() => navigate({ to: "/auth" })}>
                     Sign in to save this analysis
