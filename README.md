@@ -8,7 +8,7 @@ records, classifies processing with NOVA, and explains it all in plain language.
 
 ## Run it on your machine
 
-Requirements: **Node 20 or newer** (Vite 8 needs it) and Git.
+Requirements: **Node 20 or newer** (use the current LTS release) and Git.
 
 ```bash
 git clone https://github.com/<your-username>/<repo-name>.git labellens
@@ -19,6 +19,10 @@ npm run dev
 
 Open the URL the dev server prints. You should see the dark "Midnight Lab"
 LabelLens landing page.
+
+On Windows, you can instead double-click **`start-labellens.bat`**. It refreshes
+the required packages after every update and keeps the window open if startup
+fails so the error can be read.
 
 ### Environment variables
 
