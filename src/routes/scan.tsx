@@ -85,6 +85,7 @@ function ScanPage() {
   const [barcodeSource, setBarcodeSource] = useState<string | null>(null);
   const [step, setStep] = useState(-1);
   const [report, setReport] = useState<AnalysisReport | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [skipFirst, setSkipFirst] = useState(false);
 
@@ -180,6 +181,23 @@ function ScanPage() {
 
     setStep(PIPELINE_STEPS.length);
     setReport(withExplanation);
+
+    if (isAuthenticated) {
+      try {
+        const saved = await save({
+          data: {
+            report: withExplanation,
+            productName: options.name?.trim() || withExplanation.input.productName,
+            brand: options.brandName?.trim() || withExplanation.input.brand,
+          },
+        });
+        setSavedId(saved.id);
+        toast.success("Saved to My scans.");
+      } catch {
+        setSavedId(null);
+        toast.error("Analysis ready, but we couldn't save it to My scans.");
+      }
+    }
   }
 
   const pipeline = useMutation({
@@ -517,6 +535,7 @@ function ScanPage() {
                   variant="outline"
                   onClick={() => {
                     setReport(null);
+                    setSavedId(null);
                     setStep(-1);
                     setPreview(null);
                     setBarcodeSource(null);
@@ -528,10 +547,19 @@ function ScanPage() {
                   <Link to="/saved">View my scans</Link>
                 </Button>
                 {isAuthenticated ? (
-                  <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
-                    <Save className="size-4" aria-hidden="true" />
-                    Save to My scans
-                  </Button>
+                  savedId ? (
+                    <Button asChild variant="secondary">
+                      <Link to="/analysis/$id" params={{ id: savedId }}>
+                        <Save className="size-4" aria-hidden="true" />
+                        Saved — open full report
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
+                      <Save className="size-4" aria-hidden="true" />
+                      Save to My scans
+                    </Button>
+                  )
                 ) : (
                   <Button variant="secondary" onClick={() => navigate({ to: "/auth" })}>
                     Sign in to save this analysis
