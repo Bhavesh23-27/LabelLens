@@ -7,7 +7,7 @@ import { NovaBadge, StatusPill } from "@/components/labellens/status";
 import { Button } from "@/components/ui/button";
 import { listHistory } from "@/lib/labellens.functions";
 
-export const Route = createFileRoute("/_authenticated/history")({
+export const Route = createFileRoute("/_authenticated/saved")({
   head: () => ({
     meta: [
       { title: "My Saved Label Analyses — LabelLens" },

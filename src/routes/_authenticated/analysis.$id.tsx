@@ -35,7 +35,7 @@ function AnalysisPage() {
     <PageShell>
       <div className="mx-auto w-full max-w-4xl px-4 py-10 md:px-6 md:py-14">
         <Button asChild variant="ghost" size="sm" className="mb-6">
-          <Link to="/history">Back to my scans</Link>
+          <Link to="/saved">Back to my scans</Link>
         </Button>
 
         {isLoading ? <p className="text-sm text-muted-foreground">Loading analysis…</p> : null}
