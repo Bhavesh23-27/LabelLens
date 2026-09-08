@@ -180,6 +180,23 @@ function ScanPage() {
 
     setStep(PIPELINE_STEPS.length);
     setReport(withExplanation);
+
+    if (isAuthenticated) {
+      try {
+        const saved = await save({
+          data: {
+            report: withExplanation,
+            productName: options.name?.trim() || withExplanation.input.productName,
+            brand: options.brandName?.trim() || withExplanation.input.brand,
+          },
+        });
+        setSavedId(saved.id);
+        toast.success("Saved to My scans.");
+      } catch {
+        setSavedId(null);
+        toast.error("Analysis ready, but we couldn't save it to My scans.");
+      }
+    }
   }
 
   const pipeline = useMutation({
