@@ -5,6 +5,7 @@ import {
   Home,
   ScanLine,
   Shield,
+  ShieldCheck,
   SlidersHorizontal,
   UserRound,
 } from "lucide-react";
@@ -31,7 +32,7 @@ const MOBILE_NAV = [
 ] as const;
 
 export function SiteHeader() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
@@ -49,6 +50,14 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          {isAdmin ? (
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Link to="/admin">
+                <ShieldCheck className="mr-1.5 size-4" aria-hidden="true" />
+                Admin
+              </Link>
+            </Button>
+          ) : null}
           {isAuthenticated ? (
             <Button asChild variant="ghost" size="sm">
               <Link to="/saved">My scans</Link>
@@ -102,6 +111,7 @@ export function MobileNav() {
 }
 
 export function SiteFooter() {
+  const { isAdmin, isAuthenticated } = useAuth();
   return (
     <footer className="mt-20 border-t border-border bg-secondary/40">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 md:grid-cols-4 md:px-6">
@@ -128,8 +138,14 @@ export function SiteFooter() {
           <h2 className="font-display text-sm font-semibold">Transparency</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li><Link to="/sources" className="hover:text-foreground">Data sources</Link></li>
-            <li><Link to="/admin" className="hover:text-foreground">Knowledge base admin</Link></li>
-            <li><Link to="/auth" className="hover:text-foreground">Sign in</Link></li>
+            {isAdmin ? (
+              <li><Link to="/admin" className="hover:text-foreground">Knowledge base admin</Link></li>
+            ) : null}
+            {isAuthenticated ? (
+              <li><Link to="/account" className="hover:text-foreground">Your account</Link></li>
+            ) : (
+              <li><Link to="/auth" className="hover:text-foreground">Sign in</Link></li>
+            )}
           </ul>
         </div>
       </div>
