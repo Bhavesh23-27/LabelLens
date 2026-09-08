@@ -621,16 +621,21 @@ export const adminPromoteUser = createServerFn({ method: "POST" })
     await assertAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: user, error: userError } = await supabaseAdmin
+    const usersResult = await supabaseAdmin.auth.admin.listUsers();
+    if (usersResult.error) throw new Error(usersResult.error.message);
+
+    const matched = usersResult.data.users.find((u) => u.email === data.email);
+    if (!matched?.id) throw new Error("No registered user found with that email.");
+
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles")
       .select("id")
-      .eq("id", (await supabaseAdmin.auth.admin.listUsers()).users.find((u) => u.email === data.email)?.id ?? "")
+      .eq("id", matched.id)
       .maybeSingle();
+    if (profileError) throw new Error(profileError.message);
+    if (!profile?.id) throw new Error("No registered user found with that email.");
 
-    if (userError) throw new Error(userError.message);
-    if (!user?.id) throw new Error("No registered user found with that email.");
-
-    const { error } = await supabaseAdmin.from("user_roles").insert({ user_id: user.id, role: "admin" });
+    const { error } = await supabaseAdmin.from("user_roles").insert({ user_id: profile.id, role: "admin" });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
