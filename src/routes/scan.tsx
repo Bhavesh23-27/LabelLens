@@ -85,6 +85,7 @@ function ScanPage() {
   const [barcodeSource, setBarcodeSource] = useState<string | null>(null);
   const [step, setStep] = useState(-1);
   const [report, setReport] = useState<AnalysisReport | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [skipFirst, setSkipFirst] = useState(false);
 
