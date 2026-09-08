@@ -26,7 +26,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
 import { SAMPLE_PASTE } from "@/lib/demo-labels";
-import { addLocalScan } from "@/lib/local-history";
 import type { AnalysisReport, NutritionFacts } from "@/lib/engine/types";
 import {
   analyzeProduct,
@@ -181,7 +180,6 @@ function ScanPage() {
 
     setStep(PIPELINE_STEPS.length);
     setReport(withExplanation);
-    addLocalScan(withExplanation, options.name ?? productName, options.brandName ?? brand);
   }
 
   const pipeline = useMutation({
@@ -238,7 +236,7 @@ function ScanPage() {
       });
     },
     onSuccess: (result) => {
-      toast.success("Analysis saved to your history.");
+      toast.success("Analysis saved to My scans.");
       navigate({ to: "/analysis/$id", params: { id: result.id } });
     },
     onError: () => toast.error("Couldn't save this analysis."),
@@ -527,12 +525,12 @@ function ScanPage() {
                   Analyse another product
                 </Button>
                 <Button asChild variant="ghost">
-                  <Link to="/history">View scan history</Link>
+                  <Link to="/saved">View my scans</Link>
                 </Button>
                 {isAuthenticated ? (
                   <Button onClick={() => saving.mutate()} disabled={saving.isPending}>
                     <Save className="size-4" aria-hidden="true" />
-                    Save to my history
+                    Save to My scans
                   </Button>
                 ) : (
                   <Button variant="secondary" onClick={() => navigate({ to: "/auth" })}>

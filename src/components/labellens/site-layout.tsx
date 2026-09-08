@@ -20,13 +20,12 @@ const NAV = [
   { to: "/scan", label: "Scan a product" },
   { to: "/explore", label: "Ingredient index" },
   { to: "/compare", label: "Compare" },
-  { to: "/history", label: "History" },
 ];
 
 const MOBILE_NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/scan", label: "Scan", icon: ScanLine },
-  { to: "/history", label: "History", icon: HistoryIcon },
+  { to: "/saved", label: "My scans", icon: HistoryIcon },
   { to: "/explore", label: "Explore", icon: Compass },
   { to: "/account", label: "Profile", icon: UserRound },
 ] as const;
