@@ -16,6 +16,7 @@ export function useAuth() {
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
+      setLoading(false);
     });
     return () => {
       active = false;
