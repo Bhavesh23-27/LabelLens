@@ -157,7 +157,7 @@ function ComparePage() {
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {gap <= 4
                       ? `Both labels land within ${gap} point${gap === 1 ? "" : "s"} of each other, so the choice comes down to the individual findings below.`
-                      : `${leader} scores ${gap} point${gap === 1 ? "" : "s"} higher, is ${leadReport.nova.novaClass <= otherReport.nova.novaClass ? "less" : "more"} processed and declares ${addOf(leadReport)} numbered additive${addOf(leadReport) === 1 ? "" : "s"} against ${addOf(otherReport)}.`}
+                      : `${leader} scores ${gap} point${gap === 1 ? "" : "s"} higher: ${addOf(leadReport)} numbered additive${addOf(leadReport) === 1 ? "" : "s"} against ${addOf(otherReport)}, and processing level ${leadReport.nova.novaClass} against ${otherReport.nova.novaClass}${leadReport.nova.novaClass > otherReport.nova.novaClass ? " — so check the findings on both before choosing" : ""}.`}
                   </p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     This is a label-readability comparison, not a health verdict.
