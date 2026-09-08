@@ -101,17 +101,23 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
-    if (isLocalHost) {
-      toast.error(
-        "Google sign-in only works on the live LabelLens web address, not on your own computer. Use email and password here.",
-      );
-      return;
-    }
     setBusy(true);
-
     try {
+      const redirectTo = `${window.location.origin}/auth?redirect=${encodeURIComponent(destination)}`;
+
+      // Running on your own computer: go straight to the standard Google flow,
+      // which redirects back to localhost.
+      if (isLocalHost) {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo, queryParams: { prompt: "select_account" } },
+        });
+        if (error) throw error;
+        return;
+      }
+
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth?redirect=${encodeURIComponent(destination)}`,
+        redirect_uri: redirectTo,
       });
       if (result.error) {
         toast.error("Google sign-in didn't complete. Please try again.");
@@ -119,6 +125,8 @@ function AuthPage() {
       }
       if (result.redirected) return;
       navigate({ to: destination, replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Google sign-in failed");
     } finally {
       setBusy(false);
     }
@@ -141,16 +149,10 @@ function AuthPage() {
           variant="outline"
           className="mt-6 w-full"
           onClick={handleGoogle}
-          disabled={busy || isLocalHost}
+          disabled={busy}
         >
           Continue with Google
         </Button>
-        {isLocalHost ? (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Google sign-in is only available on the live LabelLens web address. When you run
-            LabelLens on your own computer, sign in with email and password below.
-          </p>
-        ) : null}
 
 
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
