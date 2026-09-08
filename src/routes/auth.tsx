@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { useAuth } from "@/hooks/useAuth";
 import { LabelLensLogo } from "@/components/labellens/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +53,14 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const destination = safePath(search.redirect);
+  const { isAuthenticated, loading } = useAuth();
+
+  // Already signed in (including right after a Google redirect back here) — move on.
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate({ to: destination, replace: true });
+    }
+  }, [loading, isAuthenticated, destination, navigate]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -75,7 +84,7 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
-        navigate({ to: destination });
+        navigate({ to: destination, replace: true });
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Sign in failed");
@@ -95,7 +104,7 @@ function AuthPage() {
         return;
       }
       if (result.redirected) return;
-      navigate({ to: destination });
+      navigate({ to: destination, replace: true });
     } finally {
       setBusy(false);
     }
