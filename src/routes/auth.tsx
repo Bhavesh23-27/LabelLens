@@ -54,6 +54,13 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const destination = safePath(search.redirect);
   const { isAuthenticated, loading } = useAuth();
+  const [isLocalHost, setIsLocalHost] = useState(false);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    setIsLocalHost(host === "localhost" || host === "127.0.0.1" || host === "[::1]");
+  }, []);
+
 
   // Already signed in (including right after a Google redirect back here) — move on.
   useEffect(() => {
@@ -94,7 +101,14 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
+    if (isLocalHost) {
+      toast.error(
+        "Google sign-in only works on the live LabelLens web address, not on your own computer. Use email and password here.",
+      );
+      return;
+    }
     setBusy(true);
+
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/auth?redirect=${encodeURIComponent(destination)}`,
@@ -127,10 +141,17 @@ function AuthPage() {
           variant="outline"
           className="mt-6 w-full"
           onClick={handleGoogle}
-          disabled={busy}
+          disabled={busy || isLocalHost}
         >
           Continue with Google
         </Button>
+        {isLocalHost ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Google sign-in is only available on the live LabelLens web address. When you run
+            LabelLens on your own computer, sign in with email and password below.
+          </p>
+        ) : null}
+
 
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" />
