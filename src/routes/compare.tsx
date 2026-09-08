@@ -132,7 +132,44 @@ function ComparePage() {
         ) : null}
 
         {reports ? (
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="surface mt-10 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Side-by-side result
+            </p>
+            {(() => {
+              const [a, b] = reports;
+              const nameA = a.input.productName ?? "Product A";
+              const nameB = b.input.productName ?? "Product B";
+              const gap = Math.abs(a.score.total - b.score.total);
+              const leader = a.score.total >= b.score.total ? nameA : nameB;
+              const other = a.score.total >= b.score.total ? nameB : nameA;
+              const leadReport = a.score.total >= b.score.total ? a : b;
+              const otherReport = a.score.total >= b.score.total ? b : a;
+              const addOf = (r: AnalysisReport) =>
+                r.ingredients.filter((i) => i.knowledge?.ins_number).length;
+              return (
+                <>
+                  <h2 className="mt-3 font-display text-xl font-semibold sm:text-2xl">
+                    {gap <= 4
+                      ? `${nameA} and ${nameB} look about the same`
+                      : `${leader} reads better than ${other}`}
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {gap <= 4
+                      ? `Both labels land within ${gap} point${gap === 1 ? "" : "s"} of each other, so the choice comes down to the individual findings below.`
+                      : `${leader} scores ${gap} point${gap === 1 ? "" : "s"} higher: ${addOf(leadReport)} numbered additive${addOf(leadReport) === 1 ? "" : "s"} against ${addOf(otherReport)}, and processing level ${leadReport.nova.novaClass} against ${otherReport.nova.novaClass}${leadReport.nova.novaClass > otherReport.nova.novaClass ? " — so check the findings on both before choosing" : ""}.`}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    This is a label-readability comparison, not a health verdict.
+                  </p>
+                </>
+              );
+            })()}
+          </div>
+        ) : null}
+
+        {reports ? (
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
             {reports.map((report, index) => {
               const additives = report.ingredients.filter((i) => i.knowledge?.ins_number).length;
               return (
