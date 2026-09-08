@@ -101,7 +101,14 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
+    if (isLocalHost) {
+      toast.error(
+        "Google sign-in only works on the live LabelLens web address, not on your own computer. Use email and password here.",
+      );
+      return;
+    }
     setBusy(true);
+
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/auth?redirect=${encodeURIComponent(destination)}`,
