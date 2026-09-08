@@ -23,12 +23,15 @@ npm install
 npm start
 ```
 
-Needs **Node 20 or newer** (check with `node -v`).
+Needs **Node 22.12 or newer** (check with `node -v`).
 
 ## Easiest option on Windows
 
-Double-click **`start-labellens.bat`** in the project folder. It installs
-anything missing the first time, then starts the app and prints the URL.
+Double-click **`start-labellens.bat`** in the project folder. It checks Node,
+creates the local settings file when it is missing, refreshes anything required
+after an update, then starts the app at
+http://localhost:8080. If startup fails, the window stays open and shows the
+exact error instead of disappearing.
 
 ## Getting the latest version from GitHub
 
