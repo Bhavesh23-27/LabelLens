@@ -41,8 +41,8 @@ const credentials = z.object({
 });
 
 function safePath(value: string | undefined) {
-  if (!value) return "/saved";
-  return value.startsWith("/") && !value.startsWith("//") ? value : "/saved";
+  if (!value) return "/";
+  return value.startsWith("/") && !value.startsWith("//") ? value : "/";
 }
 
 function AuthPage() {
