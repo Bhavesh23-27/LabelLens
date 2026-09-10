@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { ScoreRing } from "@/components/labellens/score-ring";
 import { Disclaimer, PageShell } from "@/components/labellens/site-layout";
@@ -13,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DEMO_LABELS } from "@/lib/demo-labels";
 import type { AnalysisReport } from "@/lib/engine/types";
-import { analyzeProduct } from "@/lib/labellens.functions";
+import { analyzeProduct, runLabelOcr } from "@/lib/labellens.functions";
+
 
 export const Route = createFileRoute("/compare")({
   head: () => ({
@@ -35,13 +37,82 @@ export const Route = createFileRoute("/compare")({
 });
 
 type Side = { name: string; text: string };
+type SideKey = "A" | "B";
+
+const MAX_BYTES = 8 * 1024 * 1024;
 
 function ComparePage() {
   const analyze = useServerFn(analyzeProduct);
+  const ocr = useServerFn(runLabelOcr);
   const [left, setLeft] = useState<Side>({ name: "", text: "" });
   const [right, setRight] = useState<Side>({ name: "", text: "" });
   const [reports, setReports] = useState<[AnalysisReport, AnalysisReport] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reading, setReading] = useState<SideKey | null>(null);
+  const [previews, setPreviews] = useState<{ A: string | null; B: string | null }>({
+    A: null,
+    B: null,
+  });
+  const galleryRefs = {
+    A: useRef<HTMLInputElement>(null),
+    B: useRef<HTMLInputElement>(null),
+  };
+  const cameraRefs = {
+    A: useRef<HTMLInputElement>(null),
+    B: useRef<HTMLInputElement>(null),
+  };
+
+  /** Reads a label photo for one side and fills its ingredient list. */
+  async function readLabel(key: SideKey, dataUrl: string) {
+    const setSide = key === "A" ? setLeft : setRight;
+    setReading(key);
+    setError(null);
+    try {
+      let text = "";
+      const result = await ocr({ data: { imageDataUrl: dataUrl } });
+      if (result.ok) {
+        text = result.text;
+        if (result.lowConfidence) {
+          toast.warning(`Product ${key}: the photo was hard to read — please check the text.`);
+        }
+      } else {
+        const { runBrowserOcr } = await import("@/lib/ocr-browser");
+        const local = await runBrowserOcr(dataUrl);
+        text = local.text;
+      }
+      if (!text || text.trim().length < 12) {
+        setError(
+          `We couldn't read enough text from the Product ${key} photo. Try a sharper, well-lit close-up of the ingredients list, or type it instead.`,
+        );
+        return;
+      }
+      setSide((prev) => ({ ...prev, text: text.trim() }));
+      toast.success(`Product ${key}: label text extracted.`);
+    } catch {
+      setError(`Couldn't read the Product ${key} photo. Please try again or type the list.`);
+    } finally {
+      setReading(null);
+    }
+  }
+
+  function handleFile(key: SideKey, file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image of the ingredient panel.");
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      toast.error("That image is larger than 8 MB. Try a smaller photo.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      setPreviews((prev) => ({ ...prev, [key]: dataUrl }));
+      void readLabel(key, dataUrl);
+    };
+    reader.readAsDataURL(file);
+  }
+
 
   const run = useMutation({
     mutationFn: async () => {
@@ -80,15 +151,15 @@ function ComparePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Compare</p>
         <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">Two products, one view</h1>
         <p className="mt-3 max-w-2xl text-[0.98rem] leading-relaxed text-muted-foreground">
-          Paste both ingredient lists. LabelLens runs the same deterministic pipeline on each so the
-          comparison is like for like.
+          Photograph each ingredient panel — or type the lists in. LabelLens reads both labels and runs
+          the same deterministic pipeline on each, so the comparison is like for like.
         </p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {([
-            ["Product A", left, setLeft] as const,
-            ["Product B", right, setRight] as const,
-          ]).map(([title, side, setSide]) => (
+            ["Product A", "A", left, setLeft] as const,
+            ["Product B", "B", right, setRight] as const,
+          ]).map(([title, key, side, setSide]) => (
             <div key={title} className="surface space-y-3 p-5">
               <h2 className="font-display text-lg font-semibold">{title}</h2>
               <div className="space-y-2">
@@ -100,6 +171,65 @@ function ComparePage() {
                   onChange={(event) => setSide({ ...side, name: event.target.value })}
                 />
               </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={reading !== null || run.isPending}
+                  onClick={() => galleryRefs[key].current?.click()}
+                >
+                  {reading === key ? (
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <ImageIcon className="size-4" aria-hidden="true" />
+                  )}
+                  Upload photo
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={reading !== null || run.isPending}
+                  onClick={() => cameraRefs[key].current?.click()}
+                >
+                  <Camera className="size-4" aria-hidden="true" />
+                  Take photo
+                </Button>
+              </div>
+              <input
+                ref={galleryRefs[key]}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) handleFile(key, file);
+                  event.target.value = "";
+                }}
+              />
+              <input
+                ref={cameraRefs[key]}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) handleFile(key, file);
+                  event.target.value = "";
+                }}
+              />
+              {previews[key] ? (
+                <img
+                  src={previews[key]!}
+                  alt={`${title} ingredient label`}
+                  className="max-h-40 w-full rounded-xl border border-border object-contain"
+                />
+              ) : null}
+              {reading === key ? (
+                <p className="text-xs text-muted-foreground">Reading the label text…</p>
+              ) : null}
+
               <div className="space-y-2">
                 <Label htmlFor={`${title}-text`}>Ingredient list</Label>
                 <Textarea
@@ -108,12 +238,16 @@ function ComparePage() {
                   maxLength={6000}
                   value={side.text}
                   onChange={(event) => setSide({ ...side, text: event.target.value })}
-                  placeholder="INGREDIENTS: …"
+                  placeholder="Scan a photo above, or type: INGREDIENTS: …"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Text read from a photo can be edited before comparing.
+                </p>
               </div>
             </div>
           ))}
         </div>
+
 
         <div className="mt-5 flex flex-wrap gap-3">
           <Button disabled={!ready || run.isPending} onClick={() => run.mutate()}>
