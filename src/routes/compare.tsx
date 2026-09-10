@@ -151,15 +151,15 @@ function ComparePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Compare</p>
         <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">Two products, one view</h1>
         <p className="mt-3 max-w-2xl text-[0.98rem] leading-relaxed text-muted-foreground">
-          Paste both ingredient lists. LabelLens runs the same deterministic pipeline on each so the
-          comparison is like for like.
+          Photograph each ingredient panel — or type the lists in. LabelLens reads both labels and runs
+          the same deterministic pipeline on each, so the comparison is like for like.
         </p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {([
-            ["Product A", left, setLeft] as const,
-            ["Product B", right, setRight] as const,
-          ]).map(([title, side, setSide]) => (
+            ["Product A", "A", left, setLeft] as const,
+            ["Product B", "B", right, setRight] as const,
+          ]).map(([title, key, side, setSide]) => (
             <div key={title} className="surface space-y-3 p-5">
               <h2 className="font-display text-lg font-semibold">{title}</h2>
               <div className="space-y-2">
@@ -171,6 +171,65 @@ function ComparePage() {
                   onChange={(event) => setSide({ ...side, name: event.target.value })}
                 />
               </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={reading !== null || run.isPending}
+                  onClick={() => galleryRefs[key].current?.click()}
+                >
+                  {reading === key ? (
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <ImageIcon className="size-4" aria-hidden="true" />
+                  )}
+                  Upload photo
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={reading !== null || run.isPending}
+                  onClick={() => cameraRefs[key].current?.click()}
+                >
+                  <Camera className="size-4" aria-hidden="true" />
+                  Take photo
+                </Button>
+              </div>
+              <input
+                ref={galleryRefs[key]}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) handleFile(key, file);
+                  event.target.value = "";
+                }}
+              />
+              <input
+                ref={cameraRefs[key]}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) handleFile(key, file);
+                  event.target.value = "";
+                }}
+              />
+              {previews[key] ? (
+                <img
+                  src={previews[key]!}
+                  alt={`${title} ingredient label`}
+                  className="max-h-40 w-full rounded-xl border border-border object-contain"
+                />
+              ) : null}
+              {reading === key ? (
+                <p className="text-xs text-muted-foreground">Reading the label text…</p>
+              ) : null}
+
               <div className="space-y-2">
                 <Label htmlFor={`${title}-text`}>Ingredient list</Label>
                 <Textarea
@@ -179,12 +238,16 @@ function ComparePage() {
                   maxLength={6000}
                   value={side.text}
                   onChange={(event) => setSide({ ...side, text: event.target.value })}
-                  placeholder="INGREDIENTS: …"
+                  placeholder="Scan a photo above, or type: INGREDIENTS: …"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Text read from a photo can be edited before comparing.
+                </p>
               </div>
             </div>
           ))}
         </div>
+
 
         <div className="mt-5 flex flex-wrap gap-3">
           <Button disabled={!ready || run.isPending} onClick={() => run.mutate()}>
