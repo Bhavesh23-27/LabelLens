@@ -47,8 +47,8 @@ echo.
 echo Starting LabelLens server...
 echo Do NOT close this window while using LabelLens.
 echo.
-
-start "" "http://localhost:8080"
+echo When it is ready, hold Ctrl and click the http://localhost:8080 link below.
+echo.
 
 call npm run dev -- --host 127.0.0.1 --port 8080
 if errorlevel 1 (
