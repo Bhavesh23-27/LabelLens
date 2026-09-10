@@ -1,5 +1,6 @@
 @echo off
 setlocal
+chcp 65001 >nul
 title LabelLens
 cd /d "%~dp0"
 
@@ -43,14 +44,18 @@ if errorlevel 1 (
 )
 
 echo.
-echo Starting LabelLens at http://localhost:8080
-echo Press Ctrl + C in this window to stop.
+echo Starting LabelLens server...
+echo Do NOT close this window while using LabelLens.
 echo.
+
+start "" "http://localhost:8080"
+
 call npm run dev -- --host 127.0.0.1 --port 8080
 if errorlevel 1 (
   echo.
   echo ERROR: LabelLens could not start. Read the error shown above.
   echo If port 8080 is already in use, close the older LabelLens window and try again.
+  echo You can also try:   npm run dev -- --port 3000
 )
 pause
 endlocal
