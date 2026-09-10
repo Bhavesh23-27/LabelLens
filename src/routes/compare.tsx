@@ -37,13 +37,82 @@ export const Route = createFileRoute("/compare")({
 });
 
 type Side = { name: string; text: string };
+type SideKey = "A" | "B";
+
+const MAX_BYTES = 8 * 1024 * 1024;
 
 function ComparePage() {
   const analyze = useServerFn(analyzeProduct);
+  const ocr = useServerFn(runLabelOcr);
   const [left, setLeft] = useState<Side>({ name: "", text: "" });
   const [right, setRight] = useState<Side>({ name: "", text: "" });
   const [reports, setReports] = useState<[AnalysisReport, AnalysisReport] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reading, setReading] = useState<SideKey | null>(null);
+  const [previews, setPreviews] = useState<{ A: string | null; B: string | null }>({
+    A: null,
+    B: null,
+  });
+  const galleryRefs = {
+    A: useRef<HTMLInputElement>(null),
+    B: useRef<HTMLInputElement>(null),
+  };
+  const cameraRefs = {
+    A: useRef<HTMLInputElement>(null),
+    B: useRef<HTMLInputElement>(null),
+  };
+
+  /** Reads a label photo for one side and fills its ingredient list. */
+  async function readLabel(key: SideKey, dataUrl: string) {
+    const setSide = key === "A" ? setLeft : setRight;
+    setReading(key);
+    setError(null);
+    try {
+      let text = "";
+      const result = await ocr({ data: { imageDataUrl: dataUrl } });
+      if (result.ok) {
+        text = result.text;
+        if (result.lowConfidence) {
+          toast.warning(`Product ${key}: the photo was hard to read — please check the text.`);
+        }
+      } else {
+        const { runBrowserOcr } = await import("@/lib/ocr-browser");
+        const local = await runBrowserOcr(dataUrl);
+        text = local.text;
+      }
+      if (!text || text.trim().length < 12) {
+        setError(
+          `We couldn't read enough text from the Product ${key} photo. Try a sharper, well-lit close-up of the ingredients list, or type it instead.`,
+        );
+        return;
+      }
+      setSide((prev) => ({ ...prev, text: text.trim() }));
+      toast.success(`Product ${key}: label text extracted.`);
+    } catch {
+      setError(`Couldn't read the Product ${key} photo. Please try again or type the list.`);
+    } finally {
+      setReading(null);
+    }
+  }
+
+  function handleFile(key: SideKey, file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image of the ingredient panel.");
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      toast.error("That image is larger than 8 MB. Try a smaller photo.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      setPreviews((prev) => ({ ...prev, [key]: dataUrl }));
+      void readLabel(key, dataUrl);
+    };
+    reader.readAsDataURL(file);
+  }
+
 
   const run = useMutation({
     mutationFn: async () => {
