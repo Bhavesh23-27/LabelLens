@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { ScoreRing } from "@/components/labellens/score-ring";
 import { Disclaimer, PageShell } from "@/components/labellens/site-layout";
@@ -13,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DEMO_LABELS } from "@/lib/demo-labels";
 import type { AnalysisReport } from "@/lib/engine/types";
-import { analyzeProduct } from "@/lib/labellens.functions";
+import { analyzeProduct, runLabelOcr } from "@/lib/labellens.functions";
+
 
 export const Route = createFileRoute("/compare")({
   head: () => ({
