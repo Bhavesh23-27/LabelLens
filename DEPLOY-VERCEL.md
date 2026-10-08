@@ -9,6 +9,23 @@ LabelLens is a TanStack Start app: part of it is the browser code, part of it is
 server that runs the ingredient analysis. Vercel runs both, and the build config
 in this repo (`vite.config.deploy.ts`) produces the exact output Vercel expects.
 
+## Will any Lovable badge or watermark show?
+
+No. The "Edit with Lovable" badge that appears on a published site is added by
+Lovable's own hosting when you use the Publish button — it is not part of this
+repository, so a Vercel deployment ships only your code. The page title, description
+and every visible string are LabelLens's own. This was checked by scanning the
+finished build: the only remaining references are internal sign-in plumbing and an
+error hook that stays inactive outside the editor.
+
+One thing to know: **Google sign-in** is routed through a shared sign-in service
+(`oauth.lovable.app`), which is also why Google's consent screen showed that
+authentication domain instead of yours. Nothing about that appears on your pages, but
+the browser does contact it during a Google sign-in. **Email and password sign-in
+talks directly to your own backend** and touches nothing else. If you want Google's
+consent screen to carry your own name, you need your own Google OAuth app with your
+own verified domain — that is a Google-side setup, not a change in this repository.
+
 ## 1. Push the code to GitHub
 
 Lovable syncs the project to a GitHub repository. Make sure the latest changes are
@@ -71,6 +88,7 @@ everything, it only skips the plain-language AI explanation paragraph.
 ## What to expect on Vercel
 
 - The public pages, analysis, comparison, saved scans and account/sign-out all work.
+- No Lovable badge, watermark, or lovable.app address anywhere a visitor can see.
 - The **Admin panel** needs a privileged database key to load its numbers. Lovable
   Cloud does not hand that key out, so it cannot be given to Vercel. Keep admin
   work on the Lovable-hosted version, or move the database to your own account
@@ -89,4 +107,5 @@ npm run build:deploy
 ```
 
 A finished build writes a `.vercel/output` folder. If that appears without errors,
-the Vercel deploy will succeed.
+the Vercel deploy will succeed. That folder is listed in `.gitignore`, so it never
+gets pushed to GitHub.
