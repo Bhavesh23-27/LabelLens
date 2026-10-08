@@ -473,11 +473,11 @@ export const adminOverview = createServerFn({ method: "GET" })
 
     return {
       totalScans: scanRows.length,
-      imageScans: scanRows.filter((s) => s.input_method === "image").length,
-      manualScans: scanRows.filter((s) => s.input_method === "manual").length,
-      demoScans: scanRows.filter((s) => s.is_demo).length,
+      imageScans: scanRows.filter((s: any) => s.input_method === "image").length,
+      manualScans: scanRows.filter((s: any) => s.input_method === "manual").length,
+      demoScans: scanRows.filter((s: any) => s.is_demo).length,
       lowConfidenceScans: scanRows.filter(
-        (s) => typeof s.ocr_confidence === "number" && s.ocr_confidence < 0.7,
+        (s: any) => typeof s.ocr_confidence === "number" && s.ocr_confidence < 0.7,
       ).length,
       totalAnalyses: analysisRows.length,
       averageScore:
