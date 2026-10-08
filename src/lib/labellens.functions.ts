@@ -170,25 +170,9 @@ export const analyzeProduct = createServerFn({ method: "POST" })
     // Unknown-ingredient review queue (admin-managed knowledge growth).
     if (report.unknownNames.length > 0) {
       try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const queueClient = createPublicClient();
         for (const raw of report.unknownNames.slice(0, 25)) {
-          const name = raw.toLowerCase().slice(0, 120);
-          const existing = await supabaseAdmin
-            .from("unknown_ingredients")
-            .select("id,occurrences")
-            .eq("raw_name", name)
-            .maybeSingle();
-          if (existing.data) {
-            await supabaseAdmin
-              .from("unknown_ingredients")
-              .update({
-                occurrences: (existing.data.occurrences ?? 1) + 1,
-                last_seen_at: new Date().toISOString(),
-              })
-              .eq("id", existing.data.id);
-          } else {
-            await supabaseAdmin.from("unknown_ingredients").insert({ raw_name: name });
-          }
+          await (queueClient.rpc as Function)("queue_unknown_ingredient", { _name: raw });
         }
       } catch (error) {
         console.error("unknown ingredient queue failed", error);
@@ -453,7 +437,7 @@ export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
 
     const [scans, analyses, ingredients, unknowns, freshness] = await Promise.all([
       supabaseAdmin.from("product_scans").select("id,input_method,ocr_confidence,is_demo"),
@@ -549,7 +533,7 @@ export const adminSaveIngredient = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
     const { id, ...fields } = data;
     const payload: Record<string, unknown> = { is_seed_data: false };
     for (const [key, value] of Object.entries(fields)) {
@@ -575,7 +559,7 @@ export const adminResolveUnknown = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
     const { error } = await supabaseAdmin
       .from("unknown_ingredients")
       .update({ status: data.status, reviewed_by: context.userId })
@@ -598,7 +582,7 @@ export const adminListAdmins = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
     const { data, error } = await supabaseAdmin
       .from("user_roles")
       .select("id,role,user_id,created_at")
@@ -631,13 +615,15 @@ export const adminPromoteUser = createServerFn({ method: "POST" })
   .validator((input: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
 
-    const usersResult = await supabaseAdmin.auth.admin.listUsers();
-    if (usersResult.error) throw new Error(usersResult.error.message);
-
-    const matched = usersResult.data.users.find((u) => u.email === data.email);
-    if (!matched?.id) throw new Error("No registered user found with that email.");
+    const { data: matchedId, error: findErr } = await (supabaseAdmin.rpc as Function)(
+      "admin_find_user_by_email",
+      { _email: data.email },
+    );
+    if (findErr) throw new Error(findErr.message);
+    const matched = { id: matchedId as string | null };
+    if (!matched.id) throw new Error("No registered user found with that email.");
 
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles")
@@ -657,7 +643,7 @@ export const adminDemoteUser = createServerFn({ method: "POST" })
   .validator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
 
     const { count, error } = await supabaseAdmin
       .from("user_roles")
@@ -673,7 +659,7 @@ export const adminListReports = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
     const { data, error } = await supabaseAdmin
       .from("analysis_results")
       .select(
@@ -690,7 +676,7 @@ export const adminDeleteReport = createServerFn({ method: "POST" })
   .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = context.supabase as any; // runs as the signed-in admin; RLS enforces admin role
 
     const { data: row, error: findError } = await supabaseAdmin
       .from("analysis_results")
