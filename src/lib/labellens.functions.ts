@@ -473,11 +473,11 @@ export const adminOverview = createServerFn({ method: "GET" })
 
     return {
       totalScans: scanRows.length,
-      imageScans: scanRows.filter((s) => s.input_method === "image").length,
-      manualScans: scanRows.filter((s) => s.input_method === "manual").length,
-      demoScans: scanRows.filter((s) => s.is_demo).length,
+      imageScans: scanRows.filter((s: any) => s.input_method === "image").length,
+      manualScans: scanRows.filter((s: any) => s.input_method === "manual").length,
+      demoScans: scanRows.filter((s: any) => s.is_demo).length,
       lowConfidenceScans: scanRows.filter(
-        (s) => typeof s.ocr_confidence === "number" && s.ocr_confidence < 0.7,
+        (s: any) => typeof s.ocr_confidence === "number" && s.ocr_confidence < 0.7,
       ).length,
       totalAnalyses: analysisRows.length,
       averageScore:
@@ -492,7 +492,7 @@ export const adminOverview = createServerFn({ method: "GET" })
       ).length,
       novaDistribution: [1, 2, 3, 4].map((cls) => ({
         novaClass: cls,
-        count: analysisRows.filter((r) => r.nova_class === cls).length,
+        count: analysisRows.filter((r: any) => r.nova_class === cls).length,
       })),
       topFlags: [...flagCounts.entries()]
         .sort((a, b) => b[1] - a[1])
@@ -590,7 +590,7 @@ export const adminListAdmins = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     const rows = data ?? [];
-    const ids = rows.map((r) => r.user_id as string);
+    const ids = rows.map((r: any) => r.user_id as string);
     const names = new Map<string, string>();
     if (ids.length > 0) {
       const { data: profiles } = await supabaseAdmin
@@ -601,7 +601,7 @@ export const adminListAdmins = createServerFn({ method: "GET" })
         names.set(p.id as string, (p.display_name as string | null) ?? "—");
       }
     }
-    return rows.map((row) => ({
+    return rows.map((row: any) => ({
       id: row.id as string,
       userId: row.user_id as string,
       role: row.role as string,

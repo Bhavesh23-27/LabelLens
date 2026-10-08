@@ -182,7 +182,7 @@ function AdminPage() {
                   Nothing awaiting review.
                 </li>
               ) : null}
-              {data.unknownQueue.map((row) => (
+              {data.unknownQueue.map((row: any) => (
                 <li
                   key={row.id as string}
                   className="surface flex items-center justify-between gap-3 p-4"
@@ -245,7 +245,7 @@ function AdminPage() {
             {admins.isLoading ? (
               <li className="text-sm text-muted-foreground">Loading admins…</li>
             ) : null}
-            {(admins.data ?? []).map((admin) => (
+            {(admins.data ?? []).map((admin: any) => (
               <li
                 key={admin.id}
                 className="surface flex items-center justify-between gap-3 p-4"
@@ -283,7 +283,7 @@ function AdminPage() {
             {reports.isLoading ? (
               <li className="text-sm text-muted-foreground">Loading reports…</li>
             ) : null}
-            {(reports.data ?? []).map((row) => {
+            {(reports.data ?? []).map((row: any) => {
               const scan = row.product_scans as {
                 product_name?: string | null;
                 brand?: string | null;
