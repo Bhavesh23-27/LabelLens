@@ -34,6 +34,11 @@ if not exist ".env" (
 echo.
 echo Preparing LabelLens...
 echo This may take a few minutes after downloading an update.
+
+rem Remove the private hosted-build package from the local copy only.
+rem It exists only inside the online workspace and is not needed to run locally.
+node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));if(p.devDependencies&&p.devDependencies['@lovable.dev/vite-tanstack-config']){delete p.devDependencies['@lovable.dev/vite-tanstack-config'];fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');}"
+
 call npm install --prefer-offline --no-audit --no-fund
 if errorlevel 1 (
   echo.
@@ -50,7 +55,7 @@ echo.
 echo When it is ready, hold Ctrl and click the http://localhost:8080 link below.
 echo.
 
-call npm run dev -- --host 127.0.0.1 --port 8080
+call npm run dev:local
 if errorlevel 1 (
   echo.
   echo ERROR: LabelLens could not start. Read the error shown above.
