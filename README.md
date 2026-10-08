@@ -14,7 +14,7 @@ Requirements: **Node 22.12 or newer** (use the current LTS release) and Git.
 git clone https://github.com/<your-username>/<repo-name>.git labellens
 cd labellens
 npm install
-npm run dev
+npm run dev:local
 ```
 
 Open the URL the dev server prints. You should see the dark "Midnight Lab"
@@ -58,7 +58,7 @@ matching, regulatory status, NOVA, allergens, concerns and the Insight Score.
 
 | Command             | What it does                                 |
 | ------------------- | -------------------------------------------- |
-| `npm run dev`       | Start the dev server with hot reload         |
+| `npm run dev:local` | Start the dev server on your own PC          |
 | `npm run build`     | Production build                             |
 | `npm run preview`   | Serve the production build locally           |
 | `npm run lint`      | ESLint                                       |
