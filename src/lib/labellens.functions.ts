@@ -590,7 +590,7 @@ export const adminListAdmins = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     const rows = data ?? [];
-    const ids = rows.map((r) => r.user_id as string);
+    const ids = rows.map((r: any) => r.user_id as string);
     const names = new Map<string, string>();
     if (ids.length > 0) {
       const { data: profiles } = await supabaseAdmin
@@ -601,7 +601,7 @@ export const adminListAdmins = createServerFn({ method: "GET" })
         names.set(p.id as string, (p.display_name as string | null) ?? "—");
       }
     }
-    return rows.map((row) => ({
+    return rows.map((row: any) => ({
       id: row.id as string,
       userId: row.user_id as string,
       role: row.role as string,
