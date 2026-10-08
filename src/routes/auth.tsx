@@ -54,11 +54,11 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const destination = safePath(search.redirect);
   const { isAuthenticated, loading } = useAuth();
-  const [isLocalHost, setIsLocalHost] = useState(false);
+  const [useBroker, setUseBroker] = useState(true);
 
   useEffect(() => {
     const host = window.location.hostname;
-    setIsLocalHost(host === "localhost" || host === "127.0.0.1" || host === "[::1]");
+    setUseBroker(host.endsWith(".lovable.app") || host.endsWith(".lovableproject.com"));
   }, []);
 
 
@@ -104,23 +104,33 @@ function AuthPage() {
     setBusy(true);
     try {
       const redirectTo = `${window.location.origin}/auth?redirect=${encodeURIComponent(destination)}`;
+      const notReady =
+        "Google sign-in isn't available on this site yet. Please sign in with email and password.";
 
-      // Running on your own computer: go straight to the standard Google flow,
-      // which redirects back to localhost.
-      if (isLocalHost) {
-        const { error } = await supabase.auth.signInWithOAuth({
+      // Own hosting (Vercel, localhost, custom domain): use the standard Google flow
+      // directly, but check first that it is configured so users never hit an error page.
+      if (!useBroker) {
+        const { data, error } = await supabase.auth.signInWithOAuth({
           provider: "google",
-          options: { redirectTo, queryParams: { prompt: "select_account" } },
+          options: { redirectTo, skipBrowserRedirect: true, queryParams: { prompt: "select_account" } },
         });
-        if (error) {
-          toast.error(
-            /secret|provider/i.test(error.message)
-              ? "Google sign-in isn't set up for local use yet. Sign in with email and password here."
-              : error.message,
-          );
+        if (error || !data?.url) {
+          toast.error(error && !/secret|provider/i.test(error.message) ? error.message : notReady);
+          return;
         }
+        try {
+          const probe = await fetch(data.url, { redirect: "manual" });
+          if (probe.type !== "opaqueredirect" && !probe.ok && probe.status >= 400) {
+            toast.error(notReady);
+            return;
+          }
+        } catch {
+          // Network/CORS quirk — fall through and let the browser try.
+        }
+        window.location.assign(data.url);
         return;
       }
+
 
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: redirectTo,
