@@ -10,7 +10,7 @@ command instead of opening a file.
 Open PowerShell in the project folder and run:
 
 ```powershell
-npm start
+npm run dev:local
 ```
 
 Then open the URL it prints (usually http://localhost:8080).
@@ -20,7 +20,7 @@ Press `Ctrl + C` in PowerShell to stop it.
 
 ```powershell
 npm install
-npm start
+npm run dev:local
 ```
 
 Needs **Node 22.12 or newer** (check with `node -v`).
@@ -38,7 +38,7 @@ exact error instead of disappearing.
 ```powershell
 git pull
 npm install
-npm start
+npm run dev:local
 ```
 
 ## Folders, in plain words
