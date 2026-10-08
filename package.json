@@ -8,6 +8,7 @@
     "dev": "vite dev",
     "dev:local": "vite dev --config vite.config.local.ts",
     "build": "vite build",
+    "build:deploy": "vite build --config vite.config.deploy.ts",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
