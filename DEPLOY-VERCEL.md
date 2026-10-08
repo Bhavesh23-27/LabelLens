@@ -89,10 +89,9 @@ everything, it only skips the plain-language AI explanation paragraph.
 
 - The public pages, analysis, comparison, saved scans and account/sign-out all work.
 - No Lovable badge, watermark, or lovable.app address anywhere a visitor can see.
-- The **Admin panel** needs a privileged database key to load its numbers. Lovable
-  Cloud does not hand that key out, so it cannot be given to Vercel. Keep admin
-  work on the Lovable-hosted version, or move the database to your own account
-  first if you want admin there too.
+- The **Admin panel** works on Vercel too: admin actions run as the signed-in
+  admin and the database only allows them for accounts with the admin role.
+  No secret key is needed.
 - Vercel's free tier is enough for a demo; the analysis server cold-starts from
   time to time, so the first scan after a wait can take a couple of seconds longer.
 
