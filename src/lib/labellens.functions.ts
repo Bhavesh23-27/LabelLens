@@ -492,7 +492,7 @@ export const adminOverview = createServerFn({ method: "GET" })
       ).length,
       novaDistribution: [1, 2, 3, 4].map((cls) => ({
         novaClass: cls,
-        count: analysisRows.filter((r) => r.nova_class === cls).length,
+        count: analysisRows.filter((r: any) => r.nova_class === cls).length,
       })),
       topFlags: [...flagCounts.entries()]
         .sort((a, b) => b[1] - a[1])
