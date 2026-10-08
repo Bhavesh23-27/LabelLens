@@ -87,7 +87,9 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created. Check your inbox to confirm your email.");
+        toast.success("Account created! Check your inbox to confirm your email, then sign in.");
+        setMode("signin");
+        setPassword("");
       } else {
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
