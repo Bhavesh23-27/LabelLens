@@ -79,7 +79,7 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
@@ -87,9 +87,20 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created! Check your inbox to confirm your email, then sign in.");
-        setMode("signin");
-        setPassword("");
+        if (data.session) {
+          toast.success("Welcome to LabelLens! Your account is ready.");
+          navigate({ to: "/", replace: true });
+        } else {
+          const { error: signInError } = await supabase.auth.signInWithPassword(parsed.data);
+          if (signInError) {
+            toast.success("Account created! Please sign in.");
+            setMode("signin");
+            setPassword("");
+          } else {
+            toast.success("Welcome to LabelLens! Your account is ready.");
+            navigate({ to: "/", replace: true });
+          }
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
