@@ -81,8 +81,9 @@ everything, it only skips the plain-language AI explanation paragraph.
 1. Open the `https://<your-project>.vercel.app` address Vercel gives you.
 2. Sign in with email and password and run a scan end to end — photo, barcode and
    pasted text all use the same analysis server.
-3. If you use Google sign-in, add the new Vercel domain to the authentication
-   provider's allowed redirect URLs, otherwise Google will refuse the new address.
+3. Google sign-in on Vercel needs your own Google OAuth Client ID/Secret saved in the
+   backend's Google sign-in settings, plus the Vercel domain in the allowed redirect URLs.
+   Until then the Google button shows a friendly "use email" message; email sign-in works.
 4. Later: **Settings → Domains** to attach your own domain.
 
 ## What to expect on Vercel
