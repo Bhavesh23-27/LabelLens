@@ -63,6 +63,7 @@ matching, regulatory status, NOVA, allergens, concerns and the Insight Score.
 | `npm run preview`   | Serve the production build locally           |
 | `npm run lint`      | ESLint                                       |
 | `npm run format`    | Prettier                                     |
+| `npm run build:deploy` | Build for hosting outside Lovable (Vercel etc.) — see `DEPLOY-VERCEL.md` |
 
 ### Where things live
 
