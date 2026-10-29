@@ -4,6 +4,16 @@ Understand what you eat — scan a packaged-food label, and LabelLens extracts t
 ingredients, matches them against a curated knowledge base and FSSAI regulatory
 records, classifies processing with NOVA, and explains it all in plain language.
 
+## Try it live
+
+**Live demo:** https://id-preview--5ad91dcc-4c84-483b-89a2-b7f2012cad56.lovable.app
+
+No installation needed — open the link, paste any packaged-food ingredient list
+(or upload a label photo / scan a barcode) and get the full analysis: Insight
+Score, NOVA group, regulatory warnings, allergen flags and source citations.
+Creating an account is optional; it only adds saved scan history and product
+comparison.
+
 ---
 
 ## Run it on your machine
